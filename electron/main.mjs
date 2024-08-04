@@ -43,6 +43,8 @@ app.whenReady().then(() => {
       )
     );
   }
+
+  wnd.maximize();
 });
 
 let db;
