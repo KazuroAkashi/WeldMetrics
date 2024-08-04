@@ -11,7 +11,7 @@ export function publish_major(cb) {
 }
 
 function publish(cb, ver) {
-  cp.execSync("npm version " + ver);
+  cp.execSync("npm version " + ver + " --sign-git-tag");
   cp.execSync("git push origin main --tags");
   cb();
 }
