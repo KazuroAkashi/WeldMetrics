@@ -88,13 +88,18 @@ const readExcel = async () => {
     []
   );
 
+  const contentRows = [];
+
+  // rows.shift() raised a type error, so I did it the old-fashioned way
   for (let i = 1; i < rows.length; i++) {
-    const qms = Array(keys.length).fill("?");
-    await $NativeService().execDb(
-      "INSERT INTO " + name + " VALUES (" + qms.join(", ") + ")",
-      rows[i]
-    );
+    contentRows[i - 1] = rows[i];
   }
+
+  const qms = Array(keys.length).fill("?");
+  await $NativeService().execMultiDb(
+    "INSERT INTO " + name + " VALUES (" + qms.join(", ") + ")",
+    contentRows
+  );
 
   useNotificationStore().send("Created table", NotificationType.SUCCESS);
 

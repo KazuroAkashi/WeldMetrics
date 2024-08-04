@@ -21,6 +21,7 @@ app.whenReady().then(() => {
   ipcMain.handle("list-tables-db", list_tables_db);
   ipcMain.handle("query-db", query_db);
   ipcMain.handle("exec-db", exec_db);
+  ipcMain.handle("exec-multi-db", exec_multi_db);
   ipcMain.handle("read-excel", read_excel);
 
   const wnd = new BrowserWindow({

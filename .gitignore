@@ -7,7 +7,7 @@
 dist
 dist-electron
 
-*.sqlite
+*.sqlite*
 
 # Node dependencies
 node_modules
