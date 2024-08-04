@@ -1,0 +1,73 @@
+
+// Calculate brightness of a given color.
+@function brightness($color) {
+    @return calc(((red($color) * .299) + (green($color) * .587) + (blue($color) * .114)) / 255 * 100%);
+}
+
+@function abs_c($a) {
+    @return if($a < 0, -$a, $a);
+}
+
+// Compares contrast of a given color to the light/dark arguments and returns whichever is most "contrasty"
+@function color-contrast($color, $dark: $dark-color, $light: $light-color) {
+    @if $color == null {
+        @return null;
+    }
+    @else {
+        $color-brightness: brightness($color);  
+        $light-text-brightness: brightness($light);
+        $dark-text-brightness: brightness($dark);
+
+        @return if(abs_c($color-brightness - $light-text-brightness) > abs_c($color-brightness - $dark-text-brightness), $light, $dark);  
+    }
+}
+
+$dark-color: #222;
+$dark-color-2: #333;
+$dark-color-3: #444;
+
+$light-color: #ddd;
+$light-color-2: #eee;
+$light-color-3: #ddd;
+
+// $primary-color: #0068df;
+// $primary-accent: #2386f8;
+$primary-color-darkmode: #00d2e1;
+$primary-accent-darkmode: lighten($primary-color-darkmode, 5);
+
+$primary-color-lightmode: #1447b4;
+$primary-accent-lightmode: lighten($primary-color-lightmode, 5);
+
+$success-color-darkmode: #22dd22;
+$info-color-darkmode: #6666dd;
+$warning-color-darkmode: #ddaa22;
+$error-color-darkmode: #dd2222;
+
+$success-color-lightmode: #22dd22;
+$info-color-lightmode: #6666dd;
+$warning-color-lightmode: #ddaa22;
+$error-color-lightmode: #dd2222;
+
+@mixin theme {
+    --dark-color: #{$dark-color};
+    @for $i from 1 through 10 {
+        --dark-color-r#{$i}: #{darken($dark-color, $i*3)};
+        --dark-color-#{$i}: #{lighten($dark-color, $i*7)};
+    }
+
+    --light-color: #{$light-color};
+    @for $i from 1 through 10 {
+        --light-color-r#{$i}: #{lighten($light-color, $i*3)};
+        --light-color-#{$i}: #{darken($light-color, $i*5)};
+    }
+
+    --primary-color: #{$primary-color-lightmode};
+    --primary-accent: #{$primary-accent-lightmode};
+    --primary-color-contrast: #{color-contrast($primary-color-lightmode)}; 
+    --primary-accent-contrast: #{color-contrast($primary-accent-lightmode)}; 
+
+    --success-color: #{$success-color-lightmode};
+    --info-color: #{$info-color-lightmode};
+    --warning-color: #{$warning-color-lightmode};
+    --error-color: #{$error-color-lightmode};
+}

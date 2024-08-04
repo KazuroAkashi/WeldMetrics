@@ -1,0 +1,98 @@
+:root {
+  @include theme;
+
+  --foreground-color: var(--dark-color);
+  --background-color: var(--light-color);
+  @for $i from 1 through 10 {
+    --foreground-color-#{$i}: var(--dark-color-#{$i});
+    --foreground-color-r#{$i}: var(--dark-color-r#{$i});
+    --background-color-#{$i}: var(--light-color-#{$i});
+    --background-color-r#{$i}: var(--light-color-r#{$i});
+  }
+}
+
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+
+  font-family: 'Nunito Sans', sans-serif;
+
+  color: var(--foreground-color);
+
+  //user-select: none;
+}
+
+.dark-theme {
+  --foreground-color: var(--light-color);
+  --background-color: var(--dark-color);
+  @for $i from 1 through 10 {
+    --foreground-color-#{$i}: var(--light-color-#{$i});
+    --foreground-color-r#{$i}: var(--light-color-r#{$i});
+    --background-color-#{$i}: var(--dark-color-#{$i});
+    --background-color-r#{$i}: var(--dark-color-r#{$i});
+  }
+
+    --primary-color: #{$primary-color-darkmode};
+    --primary-accent: #{$primary-accent-darkmode};
+    --primary-color-contrast: #{color-contrast($primary-color-darkmode)}; 
+    --primary-accent-contrast: #{color-contrast($primary-accent-darkmode)}; 
+
+    --success-color: #{$success-color-darkmode};
+    --info-color: #{$info-color-darkmode};
+    --warning-color: #{$warning-color-darkmode};
+    --error-color: #{$error-color-darkmode};
+}
+
+body {
+  background: var(--background-color);
+}
+
+a {
+  text-decoration: none;
+}
+
+.page-enter-active,
+.page-leave-active {
+  .animated & {
+    transition: all 0.2s;
+  }
+}
+.page-enter-from,
+.page-leave-to {
+  opacity: 0;
+  transform: translateY(10px);
+}
+
+@keyframes breathe {
+  from {
+    text-shadow: 0 0 5px var(--primary-color);
+  }
+  to {
+    text-shadow: 0 0 15px var(--primary-color);
+  }
+}
+
+@keyframes breathe-end {
+  from {
+    text-shadow: 0 0 10px var(--primary-color);
+  }
+  to {
+    text-shadow: 0 0 1px var(--primary-color);
+  }
+}
+
+::-webkit-scrollbar {
+  width: 4px;
+  height: 4px;
+}
+
+::-webkit-scrollbar-thumb {
+  background: var(--primary-color);
+}
+
+@import 'https://fonts.googleapis.com/css2?family=Nunito+Sans:wght@200;300;400;500;600;800&display=swap';
+
+@import 'https://fonts.googleapis.com/css?family=Poppins:100,200,300,400,500,600,700,800,900,100i,200i,300i,400i,500i,600i,700i,800i,900i&display=swap';
+
+@import "https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200"
