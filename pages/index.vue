@@ -1,6 +1,9 @@
 <template>
   <div>
     <div class="control-btns">
+      <Button type="bordered" @click="updateApp" icon="update"
+        >Check and Install Updates</Button
+      >
       <Button type="filled" @click="connectDb" icon="chevron_right"
         >Connect Database</Button
       >
@@ -118,6 +121,10 @@ const connectDb = async () => {
 const selectTable = (name: string) => {
   useDbStore().selectedTableName = name;
   $navigateTo("/table");
+};
+
+const updateApp = async () => {
+  await $NativeService().updateApp();
 };
 </script>
 

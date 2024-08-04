@@ -22,4 +22,8 @@ export class ElectronNativeService extends NativeService {
   readExcel(): Promise<{ rows: string[][]; name: string }> {
     return window.api.invoke("read-excel");
   }
+
+  updateApp(): Promise<void> {
+    return window.api.invoke("update-app");
+  }
 }

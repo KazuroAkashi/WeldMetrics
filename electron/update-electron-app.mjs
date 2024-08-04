@@ -1,3 +1,31 @@
+/*
+MIT License
+
+Copyright (c) 2018 GitHub Inc.
+
+Permission is hereby granted, free of charge, to any person obtaining a copy
+of this software and associated documentation files (the "Software"), to deal
+in the Software without restriction, including without limitation the rights
+to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+copies of the Software, and to permit persons to whom the Software is
+furnished to do so, subject to the following conditions:
+
+The above copyright notice and this permission notice shall be included in all
+copies or substantial portions of the Software.
+
+THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+SOFTWARE.
+*/
+
+/*
+This code is taken from https://github.com/electron/update-electron-app and modified.
+*/
+
 import assert from "assert";
 import isURL from "is-url";
 import ms from "ms";
@@ -29,7 +57,7 @@ const userAgent = format(
 );
 const supportedPlatforms = ["darwin", "win32"];
 
-export function updateElectronApp(opts = {}) {
+export function updateElectronApp(wnd, opts = {}) {
   // check for bad input early, so it will be logged during development
   const safeOpts = validateInput(opts);
 
@@ -41,11 +69,11 @@ export function updateElectronApp(opts = {}) {
     return;
   }
 
-  if (safeOpts.electron.app.isReady()) initUpdater(safeOpts);
-  else electron.app.on("ready", () => initUpdater(safeOpts));
+  if (electron.app.isReady()) initUpdater(wnd, safeOpts);
+  else electron.app.on("ready", () => initUpdater(wnd, safeOpts));
 }
 
-function initUpdater(opts) {
+function initUpdater(wnd, opts) {
   const { updateSource, updateInterval, logger, electron } = opts;
 
   // exit early on unsupported platforms, e.g. `linux`
@@ -78,8 +106,23 @@ function initUpdater(opts) {
   });
 
   autoUpdater.on("error", (err) => {
-    log("updater error");
-    log(err);
+    const dialogOpts = {
+      type: "error",
+      buttons: ["Ok"],
+      title: "Application Update",
+      message: "An error occured while updating:",
+      detail: err,
+    };
+
+    dialog.showMessageBox(dialogOpts).then(() => {
+      wnd.setProgressBar(0, {
+        mode: "none",
+      });
+    });
+
+    wnd.setProgressBar(1, {
+      mode: "error",
+    });
   });
 
   autoUpdater.on("checking-for-update", () => {
@@ -87,11 +130,29 @@ function initUpdater(opts) {
   });
 
   autoUpdater.on("update-available", () => {
-    log("update-available; downloading...");
+    const dialogOpts = {
+      type: "info",
+      buttons: ["Ok"],
+      title: "Application Update",
+      message: "A new version was found. Downloading...",
+    };
+
+    dialog.showMessageBox(dialogOpts);
+
+    wnd.setProgressBar(0, {
+      mode: "indeterminate",
+    });
   });
 
   autoUpdater.on("update-not-available", () => {
-    log("update-not-available");
+    const dialogOpts = {
+      type: "info",
+      buttons: ["Ok"],
+      title: "Application Update",
+      message: "Your application is up to date.",
+    };
+
+    dialog.showMessageBox(dialogOpts);
   });
 
   if (opts.notifyUser) {
@@ -108,7 +169,7 @@ function initUpdater(opts) {
 
         const dialogOpts = {
           type: "info",
-          buttons: ["Restart", "Later"],
+          buttons: ["Restart Now", "Later"],
           title: "Application Update",
           message: process.platform === "win32" ? releaseNotes : releaseName,
           detail:
@@ -116,24 +177,24 @@ function initUpdater(opts) {
         };
 
         dialog.showMessageBox(dialogOpts).then(({ response }) => {
+          wnd.setProgressBar(0, {
+            mode: "none",
+          });
           if (response === 0) autoUpdater.quitAndInstall();
+        });
+
+        wnd.setProgressBar(100, {
+          mode: "normal",
         });
       }
     );
   }
 
-  // check for updates right away and keep checking later
+  // check for updates right away
   autoUpdater.checkForUpdates();
-  setInterval(() => {
-    autoUpdater.checkForUpdates();
-  }, ms(updateInterval));
 }
 
-function guessRepo(electron) {
-  const pkgBuf = fs.readFileSync(
-    path.join(electron.app.getAppPath(), "package.json")
-  );
-  const pkg = JSON.parse(pkgBuf.toString());
+function guessRepo() {
   const repoString = pkg.repository?.url || pkg.repository;
   const repoObject = gh(repoString);
   assert(
@@ -156,14 +217,11 @@ function validateInput(opts) {
     opts
   );
 
-  // allows electron to be mocked in tests
-  const electronMock = opts.electron || electron;
-
   let updateSource = opts.updateSource;
   // Handle migration from old properties + default to update service
   if (!updateSource) {
     updateSource = {
-      repo: opts.repo || guessRepo(electronMock),
+      repo: opts.repo || guessRepo(),
       host,
     };
   }
@@ -196,7 +254,6 @@ function validateInput(opts) {
     updateSource,
     updateInterval,
     logger,
-    electron: electronMock,
     notifyUser,
   };
 }

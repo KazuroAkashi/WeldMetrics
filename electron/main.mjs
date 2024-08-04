@@ -8,13 +8,14 @@ import * as XLSX from "xlsx";
 import ess from "electron-squirrel-startup";
 
 import { updateElectronApp } from "./update-electron-app.mjs";
-updateElectronApp();
 
 /* load 'fs' for readFile and writeFile support */
 import * as fs from "fs";
 XLSX.set_fs(fs);
 
 if (ess) app.quit();
+
+let wnd;
 
 app.whenReady().then(() => {
   ipcMain.handle("connect-db", connect_db);
@@ -23,8 +24,9 @@ app.whenReady().then(() => {
   ipcMain.handle("exec-db", exec_db);
   ipcMain.handle("exec-multi-db", exec_multi_db);
   ipcMain.handle("read-excel", read_excel);
+  ipcMain.handle("update-app", update_app);
 
-  const wnd = new BrowserWindow({
+  wnd = new BrowserWindow({
     webPreferences: {
       preload: path.join(
         path.dirname(url.fileURLToPath(import.meta.url)),
@@ -91,21 +93,21 @@ export const list_tables_db = async (event) => {
   return tables;
 };
 
-export const query_db = async (event, sql, params) => {
+const query_db = async (event, sql, params) => {
   const rows = [];
   await util.each(db, sql, params, (row) => rows.push(row));
   return rows;
 };
 
-export const exec_db = async (event, sql, params) => {
+const exec_db = async (event, sql, params) => {
   await util.run(db, sql, params);
 };
 
-export const exec_multi_db = async (event, sql, paramsList) => {
+const exec_multi_db = async (event, sql, paramsList) => {
   await util.run_multi(db, sql, paramsList);
 };
 
-export const read_excel = async (event) => {
+const read_excel = async (event) => {
   const { canceled, filePaths } = await dialog.showOpenDialog();
 
   if (canceled) throw new Error("No file was selected");
@@ -128,4 +130,8 @@ export const read_excel = async (event) => {
     rows,
     name,
   };
+};
+
+const update_app = async (event) => {
+  updateElectronApp(wnd);
 };
