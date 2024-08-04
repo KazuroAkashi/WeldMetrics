@@ -52,7 +52,6 @@ const readExcel = async () => {
         continue;
       }
       const cell = row[i];
-      console.log(cell);
 
       if (cell === "" || cell === undefined) continue;
 
