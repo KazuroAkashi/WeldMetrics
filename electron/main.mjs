@@ -31,7 +31,7 @@ app.whenReady().then(() => {
         "preload.js"
       ),
     },
-    fullscreen: false,
+    autoHideMenuBar: true,
   });
 
   if (!app.isPackaged) wnd.loadURL(process.env.VITE_DEV_SERVER_URL);
