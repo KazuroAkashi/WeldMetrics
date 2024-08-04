@@ -39,7 +39,21 @@
         <table class="table-inner">
           <thead>
             <tr>
-              <th v-for="col in table.cols">{{ col.name }}</th>
+              <th v-for="col in table.cols" @click="orderBy(col)">
+                <div class="th-inner">
+                  <div>{{ col.name }}</div>
+                  <Icon
+                    class="asc-icon"
+                    icon="arrow_drop_down"
+                    v-if="getOrdering(col) === 'asc'"
+                  />
+                  <Icon
+                    class="desc-icon"
+                    icon="arrow_drop_up"
+                    v-if="getOrdering(col) === 'desc'"
+                  />
+                </div>
+              </th>
             </tr>
           </thead>
           <tbody>
@@ -197,6 +211,27 @@ const deleteCurrent = async () => {
   removeFilter();
 };
 
+const orderBy = (col: Column) => {
+  const orderingBy = useDbStore().orderBy;
+  let desc = false;
+  if (orderingBy.length === 1 && orderingBy[0].colname === col.name) {
+    desc = !orderingBy[0].desc;
+  }
+
+  useDbStore().orderBy = [{ colname: col.name, desc }];
+  populateData(1);
+};
+
+const getOrdering = (col: Column) => {
+  const orderingBy = useDbStore().orderBy;
+
+  if (orderingBy.length !== 1 || orderingBy[0].colname !== col.name) {
+    return "none";
+  }
+
+  return orderingBy[0].desc ? "desc" : "asc";
+};
+
 const firstPage = () => {
   populateData(1);
 };
@@ -313,6 +348,15 @@ const lastPage = () => {
   th {
     border-bottom: 3px solid var(--background-color-r2);
     box-shadow: 0 2px 8px 5px rgab(0, 0, 0, 0.4);
+
+    cursor: pointer;
+    user-select: none;
+
+    .th-inner {
+      display: flex;
+      justify-content: center;
+      align-items: center;
+    }
   }
 
   tbody tr:not(:last-child) {
