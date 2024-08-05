@@ -259,11 +259,11 @@ onMounted(async () => {
 }
 
 .btn.type-bordered {
+  border: 1px solid var(--accent-color);
+
   &:not(.onlyicon) {
     flex: 1;
   }
-
-  border: 1px solid var(--accent-color);
 
   .touchscreen &.touching,
   body:not(.touchscreen) &:hover {

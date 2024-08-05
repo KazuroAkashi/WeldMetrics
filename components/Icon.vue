@@ -31,11 +31,11 @@ const props = defineProps<{
 }>();
 
 const icon = computed(() => {
-  const spl = props.icon?.split(' ');
+  const spl = props.icon?.split(" ");
   return {
     icon: spl?.[0],
-    fill: spl?.[1] === 'fill',
-    fa: spl?.[0].startsWith('fa-'),
+    fill: spl?.[1] === "fill",
+    fa: spl?.[0].startsWith("fa-"),
   };
 });
 </script>
@@ -52,12 +52,11 @@ const icon = computed(() => {
   --icon-shadow: none;
   text-shadow: none;
   filter: drop-shadow(var(--icon-shadow));
+  line-height: 0;
 
   .animated & {
     transition: 0.3s filter;
   }
-
-  line-height: 0;
 
   .material-icon,
   .fa-icon :deep(*) {
@@ -75,10 +74,10 @@ const icon = computed(() => {
 }
 
 .icon:not(.fill) .material-icon {
-  font-variation-settings: 'FILL' 0;
+  font-variation-settings: "FILL" 0;
 }
 
 .icon.fill .material-icon {
-  font-variation-settings: 'FILL' 1;
+  font-variation-settings: "FILL" 1;
 }
 </style>

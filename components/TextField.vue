@@ -21,7 +21,7 @@
 </template>
 
 <script setup lang="ts">
-import { v4 } from 'uuid';
+import { v4 } from "uuid";
 
 const id = v4();
 
@@ -32,7 +32,7 @@ const props = defineProps({
   underlined: Boolean,
 });
 
-const emit = defineEmits(['input']);
+const emit = defineEmits(["input"]);
 
 const model = defineModel<string>();
 </script>
@@ -48,7 +48,7 @@ const model = defineModel<string>();
   display: flex;
 
   &.underlined::before {
-    content: '';
+    content: "";
 
     position: absolute;
     left: 0;
@@ -72,10 +72,6 @@ const model = defineModel<string>();
   padding: 10px 10px 10px 50px;
   border-radius: 3px;
 
-  .animated & {
-    transition: 0.3s;
-  }
-
   outline: none;
   border: none;
 
@@ -83,6 +79,10 @@ const model = defineModel<string>();
   color: var(--fg-color);
 
   box-shadow: 0 0 5px rgba(0, 0, 0, 0.3);
+
+  .animated & {
+    transition: 0.3s;
+  }
 
   .round & {
     border-radius: 100vmin;

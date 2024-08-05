@@ -19,19 +19,19 @@
 </template>
 
 <script setup lang="ts">
-import { useNotificationStore, NotificationType } from '~/stores/notifications';
+import { useNotificationStore, NotificationType } from "~/stores/notifications";
 
 const typename = (type: NotificationType) => {
-  return type.toString().toLocaleLowerCase('en-US');
+  return type.toString().toLocaleLowerCase("en-US");
 };
 
 const typeToColor = (type: NotificationType) => {
-  return 'var(--' + typename(type) + '-color)';
+  return "var(--" + typename(type) + "-color)";
 };
 
 const typeToIcon = (type: NotificationType) => {
   const icon = typename(type);
-  if (icon === 'success') return 'check_circle'; // Some interjection needed
+  if (icon === "success") return "check_circle"; // Some interjection needed
   return icon;
 };
 
@@ -76,9 +76,6 @@ const click = (id: number) => {
 
   background: var(--notif-color);
 
-  p {
-    color: var(--dark-color);
-  }
   padding: 7px;
   padding-right: 11px;
   padding-bottom: 8px;
@@ -98,6 +95,10 @@ const click = (id: number) => {
 
   overflow: hidden;
 
+  p {
+    color: var(--dark-color);
+  }
+
   .icon {
     --icon-color: var(--dark-color);
     font-size: 24px;
@@ -105,7 +106,7 @@ const click = (id: number) => {
 }
 
 .notif-card::after {
-  content: '';
+  content: "";
 
   position: absolute;
   left: 0;

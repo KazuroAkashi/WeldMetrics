@@ -99,14 +99,14 @@ const click = (index: number) => {
 
   box-shadow: 0 0 5px rgba(0, 0, 0, 0.3);
 
-  .animated & {
-    transition: 0.3s;
-  }
-
   padding: 8px 64px 8px 15px;
   border-radius: 7px;
 
   cursor: pointer;
+
+  .animated & {
+    transition: 0.3s;
+  }
 
   .round & {
     border-radius: 100vmin;
