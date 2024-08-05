@@ -63,11 +63,7 @@
   "config": {
     "forge": {
       "packagerConfig": {
-        "ignore": [
-          "^/(?!electron|package\\.json)"
-        ],
-        "dir": "/electron",
-        "icon": ".generated/public/favicon"
+        "icon": "electron/.generated/public/favicon"
       },
       "makers": [
         {
