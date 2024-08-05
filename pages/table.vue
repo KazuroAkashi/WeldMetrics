@@ -1,35 +1,37 @@
 <template>
   <div class="table">
     <div class="control-btns">
-      <Button type="bordered" href="/" icon="chevron_left">Back</Button>
-      <!-- <Button type="filled" href="/insert">Insert Row</Button> -->
-      <Button type="bordered" href="/options" icon="settings">Options</Button>
-      <Button type="filled" href="/filter" icon="filter_alt"
-        >Apply Filter</Button
-      >
-      <Button type="filled" href="/order" icon="format_list_numbered"
-        >Apply Order</Button
-      >
-      <Button
-        type="bordered"
-        v-if="useDbStore().filtersExist || useDbStore().customFilter"
-        @click="removeFilter"
-        icon="close"
-        >Remove Filter</Button
-      >
-      <!-- <Button
+      <TransitionGroup name="fade" appear>
+        <Button type="bordered" href="/" icon="chevron_left">Back</Button>
+        <!-- <Button type="filled" href="/insert">Insert Row</Button> -->
+        <Button type="bordered" href="/options" icon="settings">Options</Button>
+        <Button type="filled" href="/filter" icon="filter_alt"
+          >Apply Filter</Button
+        >
+        <Button type="filled" href="/order" icon="format_list_numbered"
+          >Apply Order</Button
+        >
+        <Button
+          type="bordered"
+          v-if="useDbStore().filtersExist || useDbStore().customFilter"
+          @click="removeFilter"
+          icon="close"
+          >Remove Filter</Button
+        >
+        <!-- <Button
         type="bordered"
         v-if="useDbStore().filtersExist || useDbStore().customFilter"
         @click="deleteCurrent"
         >Delete Current Items</Button
       > -->
-      <Button
-        type="bordered"
-        v-if="useDbStore().ordersExist"
-        @click="removeOrder"
-        icon="close"
-        >Remove Order</Button
-      >
+        <Button
+          type="bordered"
+          v-if="useDbStore().ordersExist"
+          @click="removeOrder"
+          icon="close"
+          >Remove Order</Button
+        >
+      </TransitionGroup>
     </div>
     <div class="table-wrapper-outer">
       <div class="table-wrapper">
@@ -83,6 +85,7 @@
         icon="keyboard_double_arrow_left"
         onlyicon
         @click="firstPage"
+        :disabled="currentPage === 1"
       ></Button>
       <Button
         type="bordered"
@@ -90,6 +93,7 @@
         icon="chevron_left"
         onlyicon
         @click="prevPage"
+        :disabled="currentPage === 1"
       ></Button>
       <h3>{{ currentPage + " / " + pageCount }}</h3>
       <Button
@@ -98,6 +102,7 @@
         icon="chevron_right"
         onlyicon
         @click="nextPage"
+        :disabled="currentPage === pageCount"
       ></Button>
       <Button
         type="bordered"
@@ -105,6 +110,7 @@
         icon="keyboard_double_arrow_right"
         onlyicon
         @click="lastPage"
+        :disabled="currentPage === pageCount"
       ></Button>
     </div>
   </div>

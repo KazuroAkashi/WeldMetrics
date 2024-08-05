@@ -34,6 +34,10 @@ app.whenReady().then(() => {
       ),
     },
     autoHideMenuBar: true,
+    icon: path.join(
+      path.dirname(url.fileURLToPath(import.meta.url)),
+      ".generated/public/favicon.ico"
+    ),
   });
 
   if (!app.isPackaged) wnd.loadURL(process.env.VITE_DEV_SERVER_URL);

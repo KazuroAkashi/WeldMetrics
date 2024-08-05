@@ -66,7 +66,8 @@
         "ignore": [
           "^/(?!electron|package\\.json)"
         ],
-        "dir": "/electron"
+        "dir": "/electron",
+        "icon": ".generated/public/favicon.ico"
       },
       "makers": [
         {
