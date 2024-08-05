@@ -1,5 +1,8 @@
 <template>
-  <div>
+  <div class="index">
+    <div class="index-bg">
+      <img src="public/cool.jpg" />
+    </div>
     <div class="control-btns">
       <Button type="bordered" @click="updateApp" icon="update"
         >Check and Install Updates</Button
@@ -181,5 +184,28 @@ const updateApp = async () => {
   flex-direction: column;
   padding: 30px 60px;
   row-gap: 30px;
+}
+
+.index {
+  position: relative;
+  height: 100vh;
+}
+
+.index-bg {
+  position: absolute;
+  top: 0;
+  right: 0;
+  bottom: 0;
+  left: 0;
+
+  display: flex;
+  justify-content: center;
+  align-items: center;
+
+  img {
+    width: 1200px;
+    filter: blur(2px) opacity(0.4);
+    border-radius: 100px;
+  }
 }
 </style>
