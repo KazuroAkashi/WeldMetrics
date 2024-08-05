@@ -3,6 +3,13 @@ export default defineNuxtConfig({
   app: {
     pageTransition: { name: "page", mode: "out-in" },
   },
+  nitro: {
+    output: {
+      dir: "electron/.generated",
+      serverDir: "electron/.generated/server",
+      publicDir: "electron/.generated/public",
+    },
+  },
   css: ["@/assets/main.scss", "@fortawesome/fontawesome-svg-core/styles.css"],
   vite: {
     vue: {
