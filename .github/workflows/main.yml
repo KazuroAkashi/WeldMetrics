@@ -5,22 +5,6 @@ on:
       - v*
 
 jobs:
-  build_on_linux:
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v2
-      - uses: actions/setup-node@master
-      - name: Install Dependencies
-        run: npm install
-      - name: Generate Page
-        run: npm run generate
-      - name: Build
-        run: npm run make
-      - name: Publish
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        run: npm run publish
-
   build_on_win:
     runs-on: windows-latest
     steps:
