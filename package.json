@@ -64,7 +64,7 @@
     "forge": {
       "packagerConfig": {
         "ignore": [
-          "^/(?!\\.output|electron)"
+          "^/(?!\\.output|electron|package\\.json)"
         ]
       },
       "makers": [
