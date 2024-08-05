@@ -36,6 +36,28 @@
 <script setup lang="ts">
 const { $NativeService, $UtilService, $navigateTo } = useNuxtApp();
 
+onMounted(async () => {
+  if (useDbStore().checkedLastDb) return;
+  useDbStore().checkedLastDb = true;
+
+  const lastConnected = window.localStorage.getItem("last-connected-db");
+
+  if (lastConnected) {
+    if (await $NativeService().fileExists(lastConnected)) {
+      const response = await $NativeService().askApprove({
+        title: "Last Database",
+        message: "Would you like to connect to the last database?",
+        detail: "Database path: " + lastConnected,
+        buttons: ["Yes", "No"],
+      });
+
+      if (response === 0) {
+        connectDb(lastConnected);
+      }
+    }
+  }
+});
+
 const readExcel = async () => {
   const { rows, name } = await $NativeService().readExcel();
 
@@ -70,10 +92,10 @@ const readExcel = async () => {
     }
 
     let type;
-    if (float) {
-      type = "FLOAT";
-    } else if (integer) {
+    if (integer) {
       type = "INTEGER";
+    } else if (float) {
+      type = "FLOAT";
     } else {
       type = "VARCHAR";
     }
@@ -108,14 +130,16 @@ const readExcel = async () => {
   await useDbStore().refreshTables();
 };
 
-const connectDb = async () => {
-  const dbName = await $NativeService().connectDb();
+const connectDb = async (dbPath?: string) => {
+  const { dbName, path } = await $NativeService().connectDb(dbPath);
   useNotificationStore().send(
     "Connected to database!",
     NotificationType.SUCCESS
   );
   await useDbStore().refreshTables();
   useDbStore().connectedTo = dbName;
+
+  window.localStorage.setItem("last-connected-db", path);
 };
 
 const selectTable = (name: string) => {

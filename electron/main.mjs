@@ -25,6 +25,10 @@ app.whenReady().then(() => {
   ipcMain.handle("exec-multi-db", exec_multi_db);
   ipcMain.handle("read-excel", read_excel);
   ipcMain.handle("update-app", update_app);
+  ipcMain.handle("file-exists", file_exists);
+  ipcMain.handle("ask-approve", ask_approve);
+  ipcMain.handle("ask-save", ask_save);
+  ipcMain.handle("export-to-excel", export_to_excel);
 
   wnd = new BrowserWindow({
     webPreferences: {
@@ -55,13 +59,16 @@ app.whenReady().then(() => {
 
 let db;
 
-export const connect_db = async (event) => {
-  const { canceled, filePaths } = await dialog.showOpenDialog();
+export const connect_db = async (event, dbPath) => {
+  if (!dbPath) {
+    const { canceled, filePaths } = await dialog.showOpenDialog();
 
-  if (canceled) throw new Error("No file was selected");
+    if (canceled) throw new Error("No file was selected");
 
+    dbPath = filePaths[0];
+  }
   await new Promise((resolve, reject) => {
-    db = new sqlite3.Database(filePaths[0], (err) => {
+    db = new sqlite3.Database(dbPath, (err) => {
       if (err) reject(err);
 
       db.run("PRAGMA journal_mode = 'WAL'");
@@ -69,7 +76,7 @@ export const connect_db = async (event) => {
     });
   });
 
-  return path.basename(filePaths[0]);
+  return { dbName: path.basename(dbPath), path: dbPath };
 };
 
 export const list_tables_db = async (event) => {
@@ -138,4 +145,44 @@ const read_excel = async (event) => {
 
 const update_app = async (event) => {
   updateElectronApp(wnd);
+};
+
+const file_exists = async (event, path) => {
+  return new Promise((resolve, reject) => {
+    fs.stat(path, (err, stat) => {
+      if (err) reject(err);
+
+      resolve(stat.isFile());
+    });
+  });
+};
+
+const ask_approve = async (event, { title, message, detail, buttons }) => {
+  const dialogOpts = {
+    type: "info",
+    buttons,
+    title,
+    message,
+    detail,
+  };
+
+  return new Promise((resolve, reject) => {
+    dialog.showMessageBox(dialogOpts).then(({ response }) => {
+      resolve(response);
+    });
+  });
+};
+
+const ask_save = async (event) => {
+  return dialog.showOpenDialog({
+    properties: ["openDirectory"],
+  });
+};
+
+const export_to_excel = async (event, filepath, data) => {
+  const sheet = XLSX.utils.aoa_to_sheet(data);
+  const workbook = XLSX.utils.book_new();
+  XLSX.utils.book_append_sheet(workbook, sheet);
+
+  XLSX.writeFile(workbook, filepath);
 };

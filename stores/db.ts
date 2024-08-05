@@ -3,6 +3,8 @@ import { FILTER_OPERATIONS, FILTER_OPERATIONS_TEMPLATES } from "~/globals";
 
 export const useDbStore = defineStore("dbstore", {
   state: () => ({
+    checkedLastDb: false,
+
     connectedTo: "",
     tables: {} as Record<string, Table>,
     selectedTableName: "",

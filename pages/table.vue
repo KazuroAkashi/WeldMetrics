@@ -5,6 +5,9 @@
         <Button type="bordered" href="/" icon="chevron_left">Back</Button>
         <!-- <Button type="filled" href="/insert">Insert Row</Button> -->
         <Button type="bordered" href="/options" icon="settings">Options</Button>
+        <Button type="bordered" @click="exportTable" icon="ios_share"
+          >Export Table</Button
+        >
         <Button type="filled" href="/filter" icon="filter_alt"
           >Apply Filter</Button
         >
@@ -236,6 +239,33 @@ const getOrdering = (col: Column) => {
   }
 
   return orderingBy[0].desc ? "desc" : "asc";
+};
+
+const exportTable = async () => {
+  const { canceled, filePaths } = await $NativeService().askSave();
+  if (canceled) return;
+
+  const firstrow = [];
+  for (const col of table.cols) {
+    firstrow.push(col.name);
+  }
+
+  const rows = await $NativeService().queryDb("SELECT * FROM " + table.name);
+  const rowsFormatted = rows.map((row) => {
+    return Object.values(row);
+  });
+
+  const aoa = [firstrow, ...rowsFormatted];
+
+  await $NativeService().exportToExcel(
+    filePaths[0] + "/" + table.name + ".xlsx",
+    aoa
+  );
+
+  useNotificationStore().send(
+    "Exported table as " + table.name + ".xlsx",
+    NotificationType.SUCCESS
+  );
 };
 
 const firstPage = () => {
