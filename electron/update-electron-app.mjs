@@ -74,7 +74,7 @@ export function updateElectronApp(wnd, opts = {}) {
 }
 
 function initUpdater(wnd, opts) {
-  const { updateSource, updateInterval, logger, electron } = opts;
+  const { updateSource, updateInterval, logger } = opts;
 
   // exit early on unsupported platforms, e.g. `linux`
   if (!supportedPlatforms.includes(process?.platform)) {
