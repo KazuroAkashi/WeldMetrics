@@ -49,7 +49,7 @@ app.whenReady().then(() => {
     wnd.loadFile(
       path.join(
         path.dirname(url.fileURLToPath(import.meta.url)),
-        "../.output/public/index.html"
+        "../electron/.generated/public/index.html"
       )
     );
   }
