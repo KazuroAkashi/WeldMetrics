@@ -1,7 +1,7 @@
 <template>
   <div class="index">
     <div class="index-bg">
-      <img src="public/cool.jpg" />
+      <img src="/cool.jpg" />
     </div>
     <div class="control-btns">
       <Button type="bordered" @click="updateApp" icon="update"
@@ -203,7 +203,7 @@ const updateApp = async () => {
   align-items: center;
 
   img {
-    width: 1200px;
+    width: 1400px;
     filter: blur(2px) opacity(0.4);
     border-radius: 100px;
   }
