@@ -3,7 +3,7 @@
   "private": true,
   "type": "commonjs",
   "main": "electron/main.mjs",
-  "version": "0.0.20",
+  "version": "0.0.21",
   "description": "A local database container with sqlite3",
   "author": "KazuroAkashi",
   "repository": {
