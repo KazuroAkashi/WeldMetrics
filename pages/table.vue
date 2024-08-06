@@ -1,17 +1,21 @@
 <template>
   <div class="table">
     <div class="control-btns">
-      <TransitionGroup name="fade" appear>
-        <Button type="bordered" href="/" icon="chevron_left">Back</Button>
+      <TransitionGroup name="hor-btns" appear>
+        <Button type="bordered" href="/" icon="chevron_left" key="1"
+          >Back</Button
+        >
         <!-- <Button type="filled" href="/insert">Insert Row</Button> -->
-        <Button type="bordered" href="/options" icon="settings">Options</Button>
-        <Button type="bordered" @click="exportTable" icon="ios_share"
+        <Button type="bordered" href="/options" icon="settings" key="2"
+          >Options</Button
+        >
+        <Button type="bordered" @click="exportTable" icon="ios_share" key="3"
           >Export Table</Button
         >
-        <Button type="filled" href="/filter" icon="filter_alt"
+        <Button type="filled" href="/filter" icon="filter_alt" key="4"
           >Apply Filter</Button
         >
-        <Button type="filled" href="/order" icon="format_list_numbered"
+        <Button type="filled" href="/order" icon="format_list_numbered" key="5"
           >Apply Order</Button
         >
         <Button
@@ -19,6 +23,7 @@
           v-if="useDbStore().filtersExist || useDbStore().customFilter"
           @click="removeFilter"
           icon="close"
+          key="5"
           >Remove Filter</Button
         >
         <!-- <Button
@@ -32,6 +37,7 @@
           v-if="useDbStore().ordersExist"
           @click="removeOrder"
           icon="close"
+          key="6"
           >Remove Order</Button
         >
       </TransitionGroup>

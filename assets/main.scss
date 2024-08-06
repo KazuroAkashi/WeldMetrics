@@ -64,19 +64,28 @@ a {
   transform: translateY(10px);
 }
 
-.fade-move,
-.fade-enter-active,
-.fade-leave-active {
+.hor-btns-move,
+.hor-btns-enter-active,
+.hor-btns-leave-active {
   transition: all 0.3s ease;
 }
-.fade-enter-from,
-.fade-leave-to {
+.hor-btns-enter-from,
+.hor-btns-leave-to {
   opacity: 0;
   transform: translateY(30px);
 }
 
-.fade-leave-active {
+.hor-btns-leave-active {
   position: absolute;
+}
+
+.fade-enter-active,
+.fade-leave-active {
+  transition: all 1.5s ease-out;
+}
+.fade-enter-from,
+.fade-leave-to {
+  opacity: 0 !important;
 }
 
 @keyframes breathe {
@@ -104,6 +113,7 @@ a {
 
 ::-webkit-scrollbar-thumb {
   background: var(--primary-color);
+  border-radius: 2px;
 }
 
 @import 'https://fonts.googleapis.com/css2?family=Nunito+Sans:wght@200;300;400;500;600;800&display=swap';

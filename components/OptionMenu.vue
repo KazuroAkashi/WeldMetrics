@@ -9,7 +9,12 @@ import { type useRefReturn } from '@/composables/useRef';
     @click="listopen = !listopen"
     v-click-outside="clickOutside"
   >
-    <div class="optionmenu-inner">
+    <div
+      class="optionmenu-inner"
+      :style="{
+        width: width + 'px',
+      }"
+    >
       <div ref="textEl" class="optionmenu-content">
         <p>{{ contentText }}</p>
       </div>
@@ -105,7 +110,7 @@ const click = (index: number) => {
   cursor: pointer;
 
   .animated & {
-    transition: 0.3s;
+    transition: 0.3s box-shadow;
   }
 
   .round & {
@@ -168,12 +173,7 @@ const click = (index: number) => {
 
   background: var(--bg-color);
 
-  overflow-x: hidden;
-  overflow-y: scroll;
-
   z-index: 20;
-
-  align-items: stretch !important;
 
   .animated & {
     transition: 0.3s;

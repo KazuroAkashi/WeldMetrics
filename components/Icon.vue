@@ -42,12 +42,17 @@ const icon = computed(() => {
 
 <style scoped lang="scss">
 .fa-icon {
-  width: 24px;
-  height: 24px;
+  width: var(--icon-size);
+  height: var(--icon-size);
   line-height: 0;
 }
 
+.material-icon {
+  font-size: var(--icon-size);
+}
+
 .icon {
+  --icon-size: 24px;
   --icon-color: var(--foreground-color);
   --icon-shadow: none;
   text-shadow: none;

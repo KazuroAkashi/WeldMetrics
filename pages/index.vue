@@ -1,6 +1,6 @@
 <template>
   <div class="index">
-    <div class="index-bg">
+    <div class="index-bg" v-if="false">
       <img src="/cool.jpg" />
     </div>
     <div class="control-btns">
