@@ -15,6 +15,7 @@
         <p>{{ notif.text }}</p>
       </div>
     </TransitionGroup>
+    <img src="/weldmetrics.png" class="logo" />
   </div>
 </template>
 
@@ -143,5 +144,13 @@ const click = (id: number) => {
 
 .notifs-leave-active {
   position: absolute;
+}
+
+.logo {
+  position: absolute;
+  right: 20px;
+  bottom: 20px;
+  width: 128px;
+  height: 128px;
 }
 </style>
