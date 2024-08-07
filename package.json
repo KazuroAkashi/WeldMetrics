@@ -64,7 +64,11 @@
     "forge": {
       "packagerConfig": {
         "icon": "electron/.generated/public/favicon",
-        "name": "WeldMetrics"
+        "name": "WeldMetrics",
+        "executableName": "WeldMetrics",
+        "win32metadata": {
+          "ProductName": "WeldMetrics"
+        }
       },
       "makers": [
         {
