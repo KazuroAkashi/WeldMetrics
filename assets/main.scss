@@ -79,6 +79,21 @@ a {
   position: absolute;
 }
 
+.vert-btns-move,
+.vert-btns-enter-active,
+.vert-btns-leave-active {
+  transition: all 0.3s ease;
+}
+.vert-btns-enter-from,
+.vert-btns-leave-to {
+  opacity: 0;
+  transform: translateX(30px);
+}
+
+.vert-btns-leave-active {
+  position: absolute;
+}
+
 .fade-enter-active,
 .fade-leave-active {
   transition: all 1.5s ease-out;

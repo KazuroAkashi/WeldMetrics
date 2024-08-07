@@ -119,7 +119,7 @@ const exec_multi_db = async (event, sql, paramsList) => {
 };
 
 const read_excel = async (event) => {
-  const { canceled, filePaths } = await dialog.showOpenDialog();
+  const { canceled, filePaths } = await dialog.showOpenDialog(wnd);
 
   if (canceled) throw new Error("No file was selected");
 
@@ -167,14 +167,14 @@ const ask_approve = async (event, { title, message, detail, buttons }) => {
   };
 
   return new Promise((resolve, reject) => {
-    dialog.showMessageBox(dialogOpts).then(({ response }) => {
+    dialog.showMessageBox(wnd, dialogOpts).then(({ response }) => {
       resolve(response);
     });
   });
 };
 
 const ask_save = async (event) => {
-  return dialog.showOpenDialog({
+  return dialog.showOpenDialog(wnd, {
     properties: ["openDirectory"],
   });
 };

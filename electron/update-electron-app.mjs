@@ -114,7 +114,7 @@ function initUpdater(wnd, opts) {
       detail: err,
     };
 
-    dialog.showMessageBox(dialogOpts).then(() => {
+    dialog.showMessageBox(wnd, dialogOpts).then(() => {
       wnd.setProgressBar(0, {
         mode: "none",
       });
@@ -137,7 +137,7 @@ function initUpdater(wnd, opts) {
       message: "A new version was found. Downloading...",
     };
 
-    dialog.showMessageBox(dialogOpts);
+    dialog.showMessageBox(wnd, dialogOpts);
 
     wnd.setProgressBar(0, {
       mode: "indeterminate",
@@ -152,7 +152,7 @@ function initUpdater(wnd, opts) {
       message: "Your application is up to date.",
     };
 
-    dialog.showMessageBox(dialogOpts);
+    dialog.showMessageBox(wnd, dialogOpts);
   });
 
   if (opts.notifyUser) {
@@ -176,7 +176,7 @@ function initUpdater(wnd, opts) {
             "A new version has been downloaded. Restart the application to apply the updates.",
         };
 
-        dialog.showMessageBox(dialogOpts).then(({ response }) => {
+        dialog.showMessageBox(wnd, dialogOpts).then(({ response }) => {
           wnd.setProgressBar(0, {
             mode: "none",
           });

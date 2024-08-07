@@ -215,17 +215,20 @@ onMounted(async () => {
   user-select: none;
 
   padding: var(--padding-vert) var(--padding-hor);
+
+  .icon {
+    left: 20px;
+  }
 }
 
 .btn.type-filled {
-  &:not(.onlyicon) {
-    flex: 1;
-  }
-
   background-color: var(--accent-color);
   color: var(--accent-contrast);
   .icon {
     --icon-color: var(--accent-contrast);
+  }
+  &:not(.onlyicon) {
+    flex: 1;
   }
 
   .touchscreen &.touching,
