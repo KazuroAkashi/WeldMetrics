@@ -1,5 +1,5 @@
 {
-  "name": "local-database-container",
+  "name": "weld-metrics",
   "private": true,
   "type": "commonjs",
   "main": "electron/main.mjs",
@@ -67,7 +67,12 @@
       },
       "makers": [
         {
-          "name": "@electron-forge/maker-squirrel"
+          "name": "@electron-forge/maker-squirrel",
+          "config": {
+            "exe": "WeldMetrics",
+            "iconUrl": "https://raw.githubusercontent.com/KazuroAkashi/local-database-container/main/public/favicon.ico"
+          }
+
         },
         {
           "name": "@electron-forge/maker-deb"

@@ -1,5 +1,5 @@
 <template>
-  <Title>Local Database Container</Title>
+  <Title>WeldMetrics</Title>
   <Transition name="load">
     <div
       class="loading-overlay"
