@@ -63,7 +63,8 @@
   "config": {
     "forge": {
       "packagerConfig": {
-        "icon": "electron/.generated/public/favicon"
+        "icon": "electron/.generated/public/favicon",
+        "name": "WeldMetrics"
       },
       "makers": [
         {
