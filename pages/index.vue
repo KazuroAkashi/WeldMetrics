@@ -9,14 +9,14 @@
     <div class="control-btns-outer">
       <div class="control-btns">
         <Button type="filled" corners="circle" @click="updateApp" icon="update"
-          >Check and Install Updates</Button
+          >Güncellemeleri Kontrol Et</Button
         >
         <Button
           type="filled"
           corners="circle"
           @click="connectDb"
           icon="chevron_right"
-          >Connect Database</Button
+          >Veritabanına Bağlan</Button
         >
         <Button
           type="filled"
@@ -24,32 +24,45 @@
           @click="readExcel"
           v-if="useDbStore().connectedTo"
           icon="document_scanner"
-          >Read Excel File</Button
+          >Excel Dosyasından Çek</Button
         >
       </div>
     </div>
     <div class="inner">
       <h3 v-if="useDbStore().connectedTo">
-        Connected to database:
+        Kullanılan veritabanı:
         <span class="accent">{{ useDbStore().connectedTo }}</span>
       </h3>
       <h2
         v-if="Object.keys(useDbStore().tables).length > 0"
         class="tables-title"
       >
-        Tables
+        Tablolar
       </h2>
       <div class="tables">
         <TransitionGroup name="vert-btns" appear>
-          <Button
-            type="filled"
-            corners="circle"
+          <div
+            class="table-btn-wrapper"
             v-for="(table, index) in Object.values(useDbStore().tables)"
-            @click="selectTable(table.name)"
             :key="index"
-            :style="{ 'transition-delay': index * 0.1 + 's' }"
-            >{{ table.name }}</Button
           >
+            <Button
+              type="filled"
+              corners="circle"
+              @click="selectTable(table.name)"
+              :style="{ 'transition-delay': index * 0.1 + 's' }"
+              class="table-btn"
+              >{{ table.name }}</Button
+            >
+            <Button
+              type="empty"
+              corners="circle"
+              onlyicon
+              icon="delete"
+              class="delete-btn"
+              @click="deleteTable(table.name)"
+            ></Button>
+          </div>
         </TransitionGroup>
       </div>
     </div>
@@ -68,10 +81,11 @@ onMounted(async () => {
   if (lastConnected) {
     if (await $NativeService().fileExists(lastConnected)) {
       const response = await $NativeService().askApprove({
-        title: "Last Database",
-        message: "Would you like to connect to the last database?",
-        detail: "Database path: " + lastConnected,
-        buttons: ["Yes", "No"],
+        title: "Son Veritabanı",
+        message:
+          "Son bağlandığınız veritabanına tekrar bağlanmak ister misiniz?",
+        detail: "Veritabanı yolu: " + lastConnected,
+        buttons: ["Evet", "Hayır"],
       });
 
       if (response === 0) {
@@ -127,7 +141,7 @@ const readExcel = async () => {
   }
 
   if (useDbStore().tables[name]) {
-    await $NativeService().execDb("DROP TABLE " + name, []);
+    await $NativeService().execDb("DROP TABLE " + name);
   }
 
   await $NativeService().execDb(
@@ -148,7 +162,7 @@ const readExcel = async () => {
     contentRows
   );
 
-  useNotificationStore().send("Created table", NotificationType.SUCCESS);
+  useNotificationStore().send("Tablo oluşturuldu.", NotificationType.SUCCESS);
 
   await useDbStore().refreshTables();
 };
@@ -156,7 +170,7 @@ const readExcel = async () => {
 const connectDb = async (dbPath?: string) => {
   const { dbName, path } = await $NativeService().connectDb(dbPath);
   useNotificationStore().send(
-    "Connected to database!",
+    "Veritabanına bağlanıldı.",
     NotificationType.SUCCESS
   );
   await useDbStore().refreshTables();
@@ -168,6 +182,24 @@ const connectDb = async (dbPath?: string) => {
 const selectTable = (name: string) => {
   useDbStore().selectedTableName = name;
   $navigateTo("/table");
+};
+
+const deleteTable = async (name: string) => {
+  const res = await $NativeService().askApprove({
+    title: "Tablo Siliniyor",
+    message: name + " tablosunu silmek istediğinize emin misiniz?",
+    detail: "Bu işlemi geri almak mümkün olmayacaktır.",
+    buttons: ["Evet, tabloyu sil.", "Geri dön"],
+  });
+
+  if (res === 0) {
+    await $NativeService().execDb("DROP TABLE " + name);
+    await useDbStore().refreshTables();
+    useNotificationStore().send(
+      name + " tablosu başarıyla silindi.",
+      NotificationType.SUCCESS
+    );
+  }
 };
 
 const updateApp = async () => {
@@ -258,11 +290,28 @@ const updateApp = async () => {
   align-items: stretch;
   column-gap: 20px;
   row-gap: 20px;
+}
 
-  * {
-    --accent-color: var(--light-color);
-    --accent-hover: var(--light-color-2);
-    --padding-hor: 100px;
+.table-btn-wrapper {
+  position: relative;
+}
+
+.table-btn {
+  --accent-color: var(--light-color);
+  --accent-hover: var(--light-color-2);
+  --padding-hor: 100px;
+}
+
+.delete-btn {
+  --accent-color: var(--error-color);
+  --accent-hover: var(--error-color);
+  &:deep(.icon) {
+    --icon-color: var(--error-color);
   }
+
+  position: absolute;
+
+  top: 0;
+  right: -64px;
 }
 </style>

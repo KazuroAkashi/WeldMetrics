@@ -11,7 +11,7 @@ export class ElectronNativeService extends NativeService {
     return window.api.invoke("query-db", sql, params);
   }
 
-  execDb(sql: string, params: any[]): Promise<void> {
+  execDb(sql: string, params: any[] = []): Promise<void> {
     return window.api.invoke("exec-db", sql, params);
   }
 
