@@ -15,7 +15,7 @@
         <p>{{ notif.text }}</p>
       </div>
     </TransitionGroup>
-    <img src="/weldmetrics.png" class="logo" />
+    <img src="/weldmetrics.png" class="logo" v-if="false" />
   </div>
 </template>
 
@@ -150,7 +150,7 @@ const click = (id: number) => {
   position: absolute;
   right: 20px;
   bottom: 20px;
-  width: 128px;
-  height: 128px;
+  width: 64px;
+  height: 64px;
 }
 </style>

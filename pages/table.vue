@@ -3,20 +3,20 @@
     <div class="control-btns">
       <TransitionGroup name="hor-btns" appear>
         <Button type="bordered" href="/" icon="chevron_left" key="1"
-          >Back</Button
+          >Geri</Button
         >
         <!-- <Button type="filled" href="/insert">Insert Row</Button> -->
         <Button type="bordered" href="/options" icon="settings" key="2"
-          >Options</Button
+          >Ayarlar</Button
         >
         <Button type="bordered" @click="exportTable" icon="ios_share" key="3"
-          >Export Table</Button
+          >Tabloyu Aktar</Button
         >
         <Button type="filled" href="/filter" icon="filter_alt" key="4"
-          >Apply Filter</Button
+          >Filtrele</Button
         >
         <Button type="filled" href="/order" icon="format_list_numbered" key="5"
-          >Apply Order</Button
+          >Sırala</Button
         >
         <Button
           type="bordered"
@@ -121,6 +121,9 @@
         @click="lastPage"
         :disabled="currentPage === pageCount"
       ></Button>
+      <div class="footer-logo-wrapper">
+        <img src="/weldmetrics.png" class="footer-logo" />
+      </div>
     </div>
   </div>
 </template>
@@ -302,6 +305,8 @@ const lastPage = () => {
   height: 100vh;
 
   overflow: hidden;
+
+  background: #184496;
 }
 
 .order-row {
@@ -320,6 +325,11 @@ const lastPage = () => {
   column-gap: 10px;
   row-gap: 10px;
   flex-wrap: wrap;
+
+  * {
+    --accent-color: var(--light-color);
+    --accent-hover: var(--light-color-2);
+  }
 }
 
 .accent {
@@ -356,7 +366,10 @@ const lastPage = () => {
 
   overflow-y: scroll;
 
-  background-color: var(--background-color-1);
+  background-color: rgb(153, 153, 153);
+  p {
+    color: #184496;
+  }
 }
 
 .table-inner {
@@ -373,19 +386,24 @@ const lastPage = () => {
   box-shadow: 0 0 8px 5px rgba(0, 0, 0, 0.4);
 
   thead {
-    background-color: var(--background-color-3);
+    background-color: #184496;
   }
 
   tbody tr:nth-child(odd) {
-    background-color: var(--background-color-1);
+    background-color: var(--foreground-color-1);
   }
   tbody tr:nth-child(even) {
-    background-color: var(--background-color-2);
+    background-color: var(--foreground-color-3);
   }
 
   th,
   td {
     padding: 5px 10px;
+    color: #184496;
+  }
+
+  td {
+    font-weight: 800;
   }
 
   th {
@@ -413,10 +431,29 @@ const lastPage = () => {
 }
 
 .page-btns {
+  position: relative;
+
   display: flex;
   justify-content: center;
   align-items: center;
   padding: 20px;
   column-gap: 20px;
+}
+
+.footer-logo-wrapper {
+  position: absolute;
+  right: 20px;
+  top: 0;
+  bottom: 0;
+  aspect-ratio: 1;
+
+  display: flex;
+  justify-content: center;
+  align-items: center;
+
+  .footer-logo {
+    width: 64px;
+    height: 64px;
+  }
 }
 </style>
