@@ -8,7 +8,7 @@
   "author": "KazuroAkashi",
   "repository": {
     "type": "git",
-    "url": "https://github.com/KazuroAkashi/local-database-container.git"
+    "url": "https://github.com/KazuroAkashi/WeldMetrics.git"
   },
   "scripts": {
     "build": "nuxt build",
@@ -74,7 +74,7 @@
         {
           "name": "@electron-forge/maker-squirrel",
           "config": {
-            "iconUrl": "https://raw.githubusercontent.com/KazuroAkashi/local-database-container/main/public/favicon.ico"
+            "iconUrl": "https://raw.githubusercontent.com/KazuroAkashi/WeldMetrics/main/public/favicon.ico"
           }
         },
         {
@@ -87,7 +87,7 @@
           "config": {
             "repository": {
               "owner": "KazuroAkashi",
-              "name": "local-database-container"
+              "name": "WeldMetrics"
             },
             "draft": true,
             "force": true
