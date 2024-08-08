@@ -119,28 +119,33 @@ const exec_multi_db = async (event, sql, paramsList) => {
 };
 
 const read_excel = async (event) => {
-  const { canceled, filePaths } = await dialog.showOpenDialog(wnd);
+  const { canceled, filePaths } = await dialog.showOpenDialog(wnd, {
+    properties: ["openFile", "multiSelections"],
+  });
 
   if (canceled) throw new Error("No file was selected");
 
-  const workbook = XLSX.read(filePaths[0], { type: "file" });
-  const [firstSheetName] = workbook.SheetNames;
-  const worksheet = workbook.Sheets[firstSheetName];
+  const ret = [];
 
-  const rows = XLSX.utils.sheet_to_json(worksheet, {
-    raw: true, // Use raw values (true) or formatted strings (false)
-    header: 1,
-    blankrows: false,
-  });
+  for (const filePath of filePaths) {
+    const workbook = XLSX.read(filePath, { type: "file" });
+    const [firstSheetName] = workbook.SheetNames;
+    const worksheet = workbook.Sheets[firstSheetName];
 
-  let name = path.basename(filePaths[0]).replace(" ", "_");
-  const li = name.lastIndexOf(".");
-  name = name.substring(0, li);
+    const rows = XLSX.utils.sheet_to_json(worksheet, {
+      raw: true, // Use raw values (true) or formatted strings (false)
+      header: 1,
+      blankrows: false,
+    });
 
-  return {
-    rows,
-    name,
-  };
+    let name = path.basename(filePath).replace(" ", "_");
+    const li = name.lastIndexOf(".");
+    name = name.substring(0, li);
+
+    ret.push({ rows, name });
+  }
+
+  return ret;
 };
 
 const update_app = async (event) => {
@@ -164,6 +169,7 @@ const ask_approve = async (event, { title, message, detail, buttons }) => {
     title,
     message,
     detail,
+    cancelId: 1,
   };
 
   return new Promise((resolve, reject) => {

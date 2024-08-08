@@ -51,14 +51,13 @@ onMounted(() => {
   justify-content: stretch;
   align-items: stretch;
   overflow: hidden;
-  &.open {
-    max-height: var(--max-height);
-  }
 }
 
 .accordion {
   --padding: 5px 5px;
   --row-gap: 5px;
+
+  box-sizing: content-box;
 
   display: flex;
   align-items: stretch;
@@ -123,8 +122,8 @@ onMounted(() => {
     animation: updown 0.8s ease infinite;
 
     --icon-size: 20px;
-    --icon-color: var(--primary-color);
-    --icon-shadow: 0 0 2px var(--primary-color);
+    --icon-color: #184496;
+    --icon-shadow: 0 0 2px #184496;
   }
 }
 

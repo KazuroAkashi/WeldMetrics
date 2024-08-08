@@ -19,7 +19,7 @@ export class ElectronNativeService extends NativeService {
     return window.api.invoke("exec-multi-db", sql, paramsList);
   }
 
-  readExcel(): Promise<{ rows: string[][]; name: string }> {
+  readExcel(): Promise<{ rows: string[][]; name: string }[]> {
     return window.api.invoke("read-excel");
   }
 

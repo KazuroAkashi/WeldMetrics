@@ -1,8 +1,8 @@
 <template>
   <div class="order">
     <div class="control-btns">
-      <Button type="filled" @click="order">Apply Order</Button>
-      <Button type="bordered" href="/table">Cancel</Button>
+      <Button type="filled" @click="order">Sırala</Button>
+      <Button type="bordered" href="/table">İptal</Button>
     </div>
     <div class="orders">
       <OrderField
@@ -64,7 +64,7 @@ const order = () => {
     });
   }
 
-  useNotificationStore().send("Applied order", NotificationType.SUCCESS);
+  useNotificationStore().send("Tablo sıralandı", NotificationType.SUCCESS);
 
   $navigateTo("/table");
 };
@@ -74,6 +74,8 @@ const order = () => {
 .order {
   height: 100vh;
   overflow-y: scroll;
+
+  background: #184496;
 }
 .control-btns {
   display: flex;

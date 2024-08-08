@@ -40,10 +40,31 @@
         Tablolar
       </h2>
       <div class="tables">
+        <div class="search-wrapper">
+          <TextField
+            placeholder="Tablo ara"
+            v-model="search_table"
+            round
+            icon="search"
+            class="search-table"
+          />
+          <Button
+            type="empty"
+            corners="circle"
+            onlyicon
+            icon="close"
+            class="delete-search-btn"
+            v-if="search_table.length > 0"
+            @click="deleteSearch"
+          ></Button>
+        </div>
         <TransitionGroup name="vert-btns" appear>
           <div
             class="table-btn-wrapper"
-            v-for="(table, index) in Object.values(useDbStore().tables)"
+            v-for="(table, index) in Object.values(useDbStore().tables).filter(
+              (table) =>
+                table.name.toLowerCase().includes(search_table.toLowerCase())
+            )"
             :key="index"
           >
             <Button
@@ -72,6 +93,8 @@
 <script setup lang="ts">
 const { $NativeService, $UtilService, $navigateTo } = useNuxtApp();
 
+const search_table = ref("");
+
 onMounted(async () => {
   if (useDbStore().checkedLastDb) return;
   useDbStore().checkedLastDb = true;
@@ -96,74 +119,80 @@ onMounted(async () => {
 });
 
 const readExcel = async () => {
-  const { rows, name } = await $NativeService().readExcel();
+  const tables = await $NativeService().readExcel();
 
-  const keys = rows[0];
-  const keysClean = keys.map((key) => key.trim().replace("\n", " "));
+  for (const table of tables) {
+    const { rows, name } = table;
 
-  const list = [];
+    const keys = rows[0];
+    const keysClean = keys.map((key) => key.trim().replace("\n", " "));
 
-  for (let i = 0; i < keys.length; i++) {
-    let integer = true;
-    let float = true;
+    const list = [];
 
-    let firstrow = true;
-    for (const row of rows) {
-      if (firstrow) {
-        firstrow = false;
-        continue;
+    for (let i = 0; i < keys.length; i++) {
+      let integer = true;
+      let float = true;
+
+      let firstrow = true;
+      for (const row of rows) {
+        if (firstrow) {
+          firstrow = false;
+          continue;
+        }
+        const cell = row[i];
+
+        if (cell === "" || cell === undefined) continue;
+
+        if (integer && !$UtilService().isInt(cell)) {
+          integer = false;
+        }
+        if (float && !$UtilService().isFloat(cell)) {
+          float = false;
+        }
+        if (!integer && !float) {
+          break;
+        }
       }
-      const cell = row[i];
 
-      if (cell === "" || cell === undefined) continue;
+      let type;
+      if (integer) {
+        type = "INTEGER";
+      } else if (float) {
+        type = "FLOAT";
+      } else {
+        type = "VARCHAR";
+      }
 
-      if (integer && !$UtilService().isInt(cell)) {
-        integer = false;
-      }
-      if (float && !$UtilService().isFloat(cell)) {
-        float = false;
-      }
-      if (!integer && !float) {
-        break;
-      }
+      list.push('"' + keysClean[i] + '" ' + type);
     }
 
-    let type;
-    if (integer) {
-      type = "INTEGER";
-    } else if (float) {
-      type = "FLOAT";
-    } else {
-      type = "VARCHAR";
+    if (useDbStore().tables[name]) {
+      await $NativeService().execDb("DROP TABLE " + name);
     }
 
-    list.push('"' + keysClean[i] + '" ' + type);
+    await $NativeService().execDb(
+      "CREATE TABLE " + name + " (" + list.join(", ") + ")",
+      []
+    );
+
+    const contentRows = [];
+
+    // rows.shift() raised a type error, so I did it the old-fashioned way
+    for (let i = 1; i < rows.length; i++) {
+      contentRows[i - 1] = rows[i];
+    }
+
+    const qms = Array(keys.length).fill("?");
+    await $NativeService().execMultiDb(
+      "INSERT INTO " + name + " VALUES (" + qms.join(", ") + ")",
+      contentRows
+    );
+
+    useNotificationStore().send(
+      "Tablo oluşturuldu: " + name,
+      NotificationType.SUCCESS
+    );
   }
-
-  if (useDbStore().tables[name]) {
-    await $NativeService().execDb("DROP TABLE " + name);
-  }
-
-  await $NativeService().execDb(
-    "CREATE TABLE " + name + " (" + list.join(", ") + ")",
-    []
-  );
-
-  const contentRows = [];
-
-  // rows.shift() raised a type error, so I did it the old-fashioned way
-  for (let i = 1; i < rows.length; i++) {
-    contentRows[i - 1] = rows[i];
-  }
-
-  const qms = Array(keys.length).fill("?");
-  await $NativeService().execMultiDb(
-    "INSERT INTO " + name + " VALUES (" + qms.join(", ") + ")",
-    contentRows
-  );
-
-  useNotificationStore().send("Tablo oluşturuldu.", NotificationType.SUCCESS);
-
   await useDbStore().refreshTables();
 };
 
@@ -200,6 +229,10 @@ const deleteTable = async (name: string) => {
       NotificationType.SUCCESS
     );
   }
+};
+
+const deleteSearch = () => {
+  search_table.value = "";
 };
 
 const updateApp = async () => {
@@ -260,8 +293,6 @@ const updateApp = async () => {
   row-gap: 20px;
 
   * {
-    --accent-color: var(--light-color);
-    --accent-hover: var(--light-color-2);
     --padding-hor: 100px;
   }
 }
@@ -282,6 +313,12 @@ const updateApp = async () => {
   text-decoration: underline;
 }
 
+.search-table:not(.increase) {
+  --fg-color: #184496;
+  --placeholder-color: #184496;
+  --hover-color: #184496;
+}
+
 .tables {
   display: flex;
   flex-direction: column;
@@ -292,26 +329,26 @@ const updateApp = async () => {
   row-gap: 20px;
 }
 
-.table-btn-wrapper {
+.table-btn-wrapper,
+.search-wrapper {
   position: relative;
 }
 
 .table-btn {
-  --accent-color: var(--light-color);
-  --accent-hover: var(--light-color-2);
   --padding-hor: 100px;
 }
 
-.delete-btn {
+.delete-btn,
+.delete-search-btn {
+  position: absolute;
+
+  top: 0;
+  right: -64px;
+
   --accent-color: var(--error-color);
   --accent-hover: var(--error-color);
   &:deep(.icon) {
     --icon-color: var(--error-color);
   }
-
-  position: absolute;
-
-  top: 0;
-  right: -64px;
 }
 </style>

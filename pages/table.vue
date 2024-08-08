@@ -24,7 +24,7 @@
           @click="removeFilter"
           icon="close"
           key="5"
-          >Remove Filter</Button
+          >Filtreleri Kaldır</Button
         >
         <!-- <Button
         type="bordered"
@@ -38,14 +38,14 @@
           @click="removeOrder"
           icon="close"
           key="6"
-          >Remove Order</Button
+          >Sıralamayı Kaldır</Button
         >
       </TransitionGroup>
     </div>
     <div class="table-wrapper-outer">
       <div class="table-wrapper">
         <p>
-          Showing <span class="accent">{{ rowCount }}</span> rows
+          <span class="accent">{{ rowCount }}</span> satır bulundu
         </p>
         <table class="table-inner">
           <thead>
@@ -95,6 +95,7 @@
         onlyicon
         @click="firstPage"
         :disabled="currentPage === 1"
+        class="page-btn"
       ></Button>
       <Button
         type="bordered"
@@ -103,6 +104,7 @@
         onlyicon
         @click="prevPage"
         :disabled="currentPage === 1"
+        class="page-btn"
       ></Button>
       <h3>{{ currentPage + " / " + pageCount }}</h3>
       <Button
@@ -112,6 +114,7 @@
         onlyicon
         @click="nextPage"
         :disabled="currentPage === pageCount"
+        class="page-btn"
       ></Button>
       <Button
         type="bordered"
@@ -120,6 +123,7 @@
         onlyicon
         @click="lastPage"
         :disabled="currentPage === pageCount"
+        class="page-btn"
       ></Button>
       <div class="footer-logo-wrapper">
         <img src="/weldmetrics.png" class="footer-logo" />
@@ -272,7 +276,7 @@ const exportTable = async () => {
   );
 
   useNotificationStore().send(
-    "Exported table as " + table.name + ".xlsx",
+    "Tablo dışarıya aktarıldı: " + table.name + ".xlsx",
     NotificationType.SUCCESS
   );
 };
@@ -333,7 +337,7 @@ const lastPage = () => {
 }
 
 .accent {
-  color: var(--primary-color);
+  color: #184496;
   font-weight: bold;
 }
 

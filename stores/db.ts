@@ -20,6 +20,18 @@ export const useDbStore = defineStore("dbstore", {
       const { $NativeService } = useNuxtApp();
 
       this.tables = await $NativeService().listTablesDb();
+
+      for (const table of Object.values(this.tables)) {
+        for (const col of table.cols) {
+          if (col.type !== "VARCHAR") continue;
+
+          const items = await $NativeService().queryDb(
+            'SELECT DISTINCT "' + col.name + '" FROM ' + table.name
+          );
+
+          col.distinct_values = items.map((item) => item[col.name]);
+        }
+      }
     },
   },
 
@@ -108,6 +120,7 @@ export const useDbStore = defineStore("dbstore", {
             );
 
           const str = JSON.stringify(list);
+          console.log(str);
 
           ret.push(
             '"' +

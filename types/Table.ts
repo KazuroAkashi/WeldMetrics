@@ -14,4 +14,5 @@ interface Column {
   notnull: number;
   dflt_value: any;
   pk: number;
+  distinct_values?: string[];
 }

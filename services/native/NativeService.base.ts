@@ -6,7 +6,7 @@ export abstract class NativeService {
   abstract queryDb(sql: string, params: any[]): Promise<Record<string, any>[]>;
   abstract execDb(sql: string, params: any[]): Promise<void>;
   abstract execMultiDb(sql: string, paramsList: any[][]): Promise<void>;
-  abstract readExcel(): Promise<{ rows: string[][]; name: string }>;
+  abstract readExcel(): Promise<{ rows: string[][]; name: string }[]>;
   abstract updateApp(): Promise<void>;
   abstract fileExists(path: string): Promise<boolean>;
   abstract askApprove(opts: {

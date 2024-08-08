@@ -1,15 +1,15 @@
 <template>
   <div class="filter">
     <div class="control-btns">
-      <Button type="filled" @click="filter">Apply Filter</Button>
-      <Button type="bordered" href="/customfilter">Custom Filter</Button>
-      <Button type="bordered" href="/table">Cancel</Button>
+      <Button type="filled" @click="filter">Filtrele</Button>
+      <Button type="bordered" href="/customfilter">Özel Filtre</Button>
+      <Button type="bordered" href="/table">İptal</Button>
     </div>
     <div class="filters">
       <div class="all-any">
-        <h5>All</h5>
+        <h5>Hepsi</h5>
         <Checkbox v-model="allany" />
-        <h5>Any</h5>
+        <h5>Herhangi Biri</h5>
       </div>
       <FilterField
         v-for="i in filterCount"
@@ -53,47 +53,54 @@ const filterCount = ref(useDbStore().useFilter.length);
 
 const table = useDbStore().selectedTable;
 
-const colindex_start = useDbStore().useFilter.map((filter) => {
-  const col = useDbStore().selectedTable.cols.find(
-    (col) => col.name === filter.colname
-  );
-  return col?.cid;
-});
+onMounted(() => {
+  const colindex_start = useDbStore().useFilter.map((filter) => {
+    const col = useDbStore().selectedTable.cols.find(
+      (col) => col.name === filter.colname
+    );
+    return col?.cid;
+  });
 
-const opindex_start = useDbStore().useFilter.map((filter) => {
-  return FILTER_OPERATIONS.findIndex((op) => op === filter.op);
-});
+  const opindex_start = useDbStore().useFilter.map((filter) => {
+    return FILTER_OPERATIONS.findIndex((op) => op === filter.op);
+  });
 
-const comp1_start = [];
-const comp2_start = [];
+  const comp1_start = [];
+  const comp2_start = [];
 
-const filterParams = useDbStore().useFilterParamsFull;
+  const filterParams = useDbStore().useFilterParamsFull;
 
-let cursor = 0;
-for (const filter of useDbStore().useFilter) {
-  const index = FILTER_OPERATIONS.findIndex((op) => op === filter.op);
-  const parameterCount = FILTER_OPERATIONS_PARAMETER_COUNTS[index];
+  let cursor = 0;
+  for (const filter of useDbStore().useFilter) {
+    const index = FILTER_OPERATIONS.findIndex((op) => op === filter.op);
+    const parameterCount = FILTER_OPERATIONS_PARAMETER_COUNTS[index];
 
-  let c1push = "";
-  let c2push = "";
+    let c1push = "";
+    let c2push = "";
 
-  if (parameterCount >= 1) {
-    c1push = filterParams[cursor];
-    cursor++;
-    if (parameterCount >= 2) {
-      c2push = filterParams[cursor];
+    if (parameterCount >= 1) {
+      c1push = filterParams[cursor] + "";
       cursor++;
+      if (parameterCount >= 2) {
+        c2push = filterParams[cursor] + "";
+        cursor++;
+      }
     }
+
+    comp1_start.push(c1push);
+    comp2_start.push(c2push);
   }
 
-  comp1_start.push(c1push);
-  comp2_start.push(c2push);
-}
+  colindex.value = colindex_start;
+  opindex.value = opindex_start;
+  comp1.value = comp1_start;
+  comp2.value = comp2_start;
+});
 
-const colindex = ref(colindex_start);
-const opindex = ref(opindex_start);
-const comp1 = ref(comp1_start);
-const comp2 = ref(comp2_start);
+const colindex = ref([]) as Ref<(number | undefined)[]>;
+const opindex = ref([]) as Ref<(number | undefined)[]>;
+const comp1 = ref([]) as Ref<string[]>;
+const comp2 = ref([]) as Ref<string[]>;
 
 const allany = ref(useDbStore().useFilterAny);
 
@@ -116,7 +123,7 @@ const filter = () => {
       (parameterCount >= 2 && !comp2.value[i])
     ) {
       useNotificationStore().send(
-        "Do not leave empty parameters!",
+        "Boş parametre bırakılamaz.",
         NotificationType.ERROR
       );
       return;
@@ -139,7 +146,7 @@ const filter = () => {
     });
   }
 
-  useNotificationStore().send("Applied filter", NotificationType.SUCCESS);
+  useNotificationStore().send("Tablo filtrelendi.", NotificationType.SUCCESS);
 
   $navigateTo("/table");
 };
@@ -149,6 +156,8 @@ const filter = () => {
 .filter {
   height: 100vh;
   overflow-y: scroll;
+
+  background: #184496;
 }
 .control-btns {
   display: flex;

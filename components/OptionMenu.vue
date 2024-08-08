@@ -1,4 +1,3 @@
-import { type useRefReturn } from '@/composables/useRef';
 <template>
   <div
     class="optionmenu-wrapper"
@@ -79,11 +78,11 @@ const click = (index: number) => {
 
 <style scoped lang="scss">
 .optionmenu-wrapper {
-  --bg-color: var(--background-color-1);
-  --bg-hover: var(--background-color-3);
-  --fg-color: var(--foreground-color-1);
-  --placeholder-color: var(--foreground-color-4);
-  --hover-color: var(--primary-color);
+  --bg-color: var(--light-color);
+  --bg-hover: var(--light-color-2);
+  --fg-color: #184496;
+  --placeholder-color: #184496;
+  --hover-color: #184496;
 
   --option-padding-lr: 12px;
   --option-padding-tb: 8px;
@@ -132,6 +131,7 @@ const click = (index: number) => {
   }
   .optionmenu-wrapper.active & p {
     color: var(--fg-color);
+    font-weight: bold;
   }
 }
 
@@ -151,9 +151,13 @@ const click = (index: number) => {
     transition: 0.2s;
   }
 
+  .icon {
+    --icon-color: #184496;
+  }
+
   body:not(.touchscreen) .optionmenu-wrapper:hover & .icon,
   .optionmenu-wrapper.open & .icon {
-    --icon-color: var(--primary-color);
+    --icon-color: var(--hover-color);
     text-shadow: 0 0 10px var(--hover-color);
   }
 
@@ -167,7 +171,6 @@ const click = (index: number) => {
   top: calc(100% + 5px);
   left: 0;
   right: 0;
-  max-height: 0;
 
   border-radius: 5px;
 
@@ -188,5 +191,7 @@ const click = (index: number) => {
 .optionmenu-option {
   --padding-vert: var(--option-padding-tb);
   --padding-hor: var(--option-padding-lr);
+
+  color: #184496 !important;
 }
 </style>

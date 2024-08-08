@@ -1,11 +1,15 @@
 <template>
   <div class="options">
     <div class="control-btns">
-      <Button type="filled" @click="apply">Apply</Button>
-      <Button type="bordered" href="/table">Cancel</Button>
+      <Button type="filled" @click="apply">Uygula</Button>
+      <Button type="bordered" href="/table">İptal</Button>
     </div>
     <div class="fields">
-      <TextField placeholder="Items per page" underlined v-model.number="ipp" />
+      <TextField
+        placeholder="Sayfa başı satır sayısı"
+        underlined
+        v-model.number="ipp"
+      />
     </div>
   </div>
 </template>
@@ -18,7 +22,7 @@ const ipp = ref(useDbStore().itemsPerPage);
 const apply = async () => {
   if (ipp.value <= 0 || ipp.value > 1000) {
     useNotificationStore().send(
-      "Items per page must be between 0 and 1000!",
+      "Sayfa başına satır sayısı 0 ile 1000 arasında olmalıdır.",
       NotificationType.ERROR
     );
     return;
@@ -27,7 +31,7 @@ const apply = async () => {
   useDbStore().itemsPerPage = ipp.value;
   window.localStorage.setItem("itemsPerPage", ipp.value.toString());
 
-  useNotificationStore().send("Applied options!", NotificationType.SUCCESS);
+  useNotificationStore().send("Ayarlar uygulandı.", NotificationType.SUCCESS);
 
   $navigateTo("/table");
 };
@@ -37,6 +41,8 @@ const apply = async () => {
 .options {
   height: 100vh;
   overflow-y: scroll;
+
+  background: #184496;
 }
 
 .control-btns {

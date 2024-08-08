@@ -189,16 +189,16 @@ onMounted(async () => {
   --padding-hor: 50px;
   --icon-size: 24px;
 
-  --accent-hover: var(--primary-accent);
-  --accent-hover-contrast: var(--primary-accent-contrast);
+  --accent-hover: var(--light-color);
+  --accent-hover-contrast: var(--dark-color);
 
-  --accent-color: var(--primary-color);
-  --accent-contrast: var(--primary-color-contrast);
+  --accent-color: var(--light-color-2);
+  --accent-contrast: var(--dark-color-2);
 
   --disabled-fg: var(--background-color-4);
   --disabled-bg: var(--foreground-color-6);
 
-  --bg-hover: var(--background-color-3);
+  --bg-hover: var(--light-color-2);
 }
 
 .btn {
@@ -381,6 +381,7 @@ onMounted(async () => {
 .btn.type-none {
   flex: 1;
   justify-content: flex-start;
+  color: var(--accent-color-contrast);
   .touchscreen &.touching,
   body:not(.touchscreen) &:hover {
     background: var(--bg-hover);

@@ -10,7 +10,7 @@
 </template>
 
 <script setup lang="ts">
-import { v4 } from 'uuid';
+import { v4 } from "uuid";
 
 const id = v4();
 
@@ -43,6 +43,8 @@ const checked = defineModel<boolean>();
 }
 
 .checkbox {
+  --active-color: var(--light-color);
+
   display: flex;
   justify-content: center;
   align-items: center;
@@ -71,12 +73,12 @@ const checked = defineModel<boolean>();
   cursor: pointer;
 
   body:not(.touchscreen) &:hover {
-    box-shadow: 0 0 5px var(--primary-color);
+    box-shadow: 0 0 5px var(--active-color);
   }
 
   .checkbox-input:checked ~ & {
-    background-color: var(--primary-color);
-    box-shadow: 0 0 15px var(--primary-color);
+    background-color: var(--active-color);
+    box-shadow: 0 0 15px var(--active-color);
   }
 }
 .checkbox-ball {
@@ -97,7 +99,7 @@ const checked = defineModel<boolean>();
     left: calc(100% - var(--left));
     transform: translateX(-100%);
 
-    background-color: var(--primary-color-contrast);
+    background-color: black;
   }
 }
 </style>

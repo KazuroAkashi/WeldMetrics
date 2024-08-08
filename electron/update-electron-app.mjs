@@ -108,9 +108,9 @@ function initUpdater(wnd, opts) {
   autoUpdater.on("error", (err) => {
     const dialogOpts = {
       type: "error",
-      buttons: ["Ok"],
-      title: "Application Update",
-      message: "An error occured while updating:",
+      buttons: ["Tamam"],
+      title: "Güncelleme",
+      message: "Güncellenirken bir hata oluştu:",
       detail: err,
     };
 
@@ -132,9 +132,9 @@ function initUpdater(wnd, opts) {
   autoUpdater.on("update-available", () => {
     const dialogOpts = {
       type: "info",
-      buttons: ["Ok"],
-      title: "Application Update",
-      message: "A new version was found. Downloading...",
+      buttons: ["Tamam"],
+      title: "Güncelleme",
+      message: "Yeni bir versiyon bulundu. Yükleniyor...",
     };
 
     dialog.showMessageBox(wnd, dialogOpts);
@@ -147,9 +147,9 @@ function initUpdater(wnd, opts) {
   autoUpdater.on("update-not-available", () => {
     const dialogOpts = {
       type: "info",
-      buttons: ["Ok"],
-      title: "Application Update",
-      message: "Your application is up to date.",
+      buttons: ["Tamam"],
+      title: "Güncelleme",
+      message: "Güncel versiyondasınız.",
     };
 
     dialog.showMessageBox(wnd, dialogOpts);
@@ -169,11 +169,11 @@ function initUpdater(wnd, opts) {
 
         const dialogOpts = {
           type: "info",
-          buttons: ["Restart Now", "Later"],
-          title: "Application Update",
+          buttons: ["Şimdi Yeniden Başlat", "Sonra"],
+          title: "Güncelleme",
           message: process.platform === "win32" ? releaseNotes : releaseName,
           detail:
-            "A new version has been downloaded. Restart the application to apply the updates.",
+            "Yeni bir versiyon yüklendi. Güncellemeyi uygulamak için programı yeniden başlatmanız gerekiyor.",
         };
 
         dialog.showMessageBox(wnd, dialogOpts).then(({ response }) => {

@@ -4,12 +4,13 @@
       :options="colnames"
       v-model="orderIndex"
       :max-height="300"
-      placeholder="Select Column"
+      placeholder="Sütun"
     />
 
     <div style="display: flex; column-gap: 12px; align-items: center">
-      <p>Descending</p>
+      <p>Artan</p>
       <Checkbox v-model="orderDescending" />
+      <p>Azalan</p>
     </div>
   </div>
 </template>
@@ -33,5 +34,9 @@ const orderDescending = defineModel<boolean>("desc");
   margin-right: 50px;
   margin-top: 30px;
   column-gap: 20px;
+
+  p {
+    font-weight: bold;
+  }
 }
 </style>

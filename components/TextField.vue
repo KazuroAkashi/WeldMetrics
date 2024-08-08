@@ -39,10 +39,10 @@ const model = defineModel<string>();
 
 <style scoped lang="scss">
 .textfield-wrapper {
-  --bg-color: var(--background-color-1);
+  --bg-color: var(--light-color-5);
   --fg-color: var(--foreground-color-1);
   --placeholder-color: var(--foreground-color-3);
-  --hover-color: var(--primary-color);
+  --hover-color: var(--light-color);
 
   position: relative;
   display: flex;
@@ -84,7 +84,7 @@ const model = defineModel<string>();
     transition: 0.3s;
   }
 
-  .round & {
+  .round > & {
     border-radius: 100vmin;
   }
 
@@ -95,6 +95,11 @@ const model = defineModel<string>();
 
   .textfield-wrapper:not(.icon) > & {
     padding-left: 5px;
+  }
+
+  &::placeholder {
+    color: var(--fg-color);
+    opacity: 0.7;
   }
 }
 
@@ -113,6 +118,10 @@ const model = defineModel<string>();
 
   .animated & > span {
     transition: 0.3s;
+  }
+
+  .icon {
+    --icon-color: var(--fg-color);
   }
 
   .textfield-input:focus ~ & .icon,
@@ -166,7 +175,7 @@ const model = defineModel<string>();
   .textfield-input:focus ~ &,
   .textfield-input:not(:placeholder-shown) ~ & {
     transform: translateY(-50%) scale(0.5);
-    color: var(--primary-color);
+    color: var(--hover-color);
   }
 }
 </style>
