@@ -20,7 +20,10 @@
         >
         <Button
           type="bordered"
-          v-if="useDbStore().filtersExist || useDbStore().customFilter"
+          v-if="
+            useDbStore().filtersExist ||
+            useDbStore().selectedTableOptions.customFilter
+          "
           @click="removeFilter"
           icon="close"
           key="5"
@@ -142,9 +145,11 @@ const currentPage = ref(1);
 const itemsPerPage = ref(useDbStore().itemsPerPage);
 
 const rowCount = ref(0);
-const pageCount = computed(() =>
-  Math.ceil(rowCount.value / itemsPerPage.value)
-);
+const pageCount = computed(() => {
+  const count = Math.ceil(rowCount.value / itemsPerPage.value);
+  if (count > 0) return count;
+  else return 1;
+});
 
 const data = ref([] as Record<string, any>[]);
 
@@ -156,15 +161,17 @@ onMounted(async () => {
 const fetchRowCount = async () => {
   let sql = "SELECT COUNT(*) FROM " + table.name;
 
-  if (useDbStore().customFilter) {
-    sql += " WHERE " + useDbStore().customFilter;
+  if (useDbStore().selectedTableOptions.customFilter) {
+    sql += " WHERE " + useDbStore().selectedTableOptions.customFilter;
   } else if (useDbStore().filtersExist) {
     sql += " WHERE " + useDbStore().useFilterString;
   }
 
   const val = await $NativeService().queryDb(
     sql,
-    useDbStore().customFilter ? [] : toRaw(useDbStore().useFilterParams)
+    useDbStore().selectedTableOptions.customFilter
+      ? []
+      : toRaw(useDbStore().useFilterParams)
   );
   rowCount.value = (val[0] as any)["COUNT(*)"];
 };
@@ -174,14 +181,14 @@ const populateData = async (page: number) => {
 
   let sql = "SELECT * FROM " + table.name;
 
-  if (useDbStore().customFilter) {
-    sql += " WHERE " + useDbStore().customFilter;
+  if (useDbStore().selectedTableOptions.customFilter) {
+    sql += " WHERE " + useDbStore().selectedTableOptions.customFilter;
   } else if (useDbStore().filtersExist) {
     sql += " WHERE " + useDbStore().useFilterString;
   }
 
   if (useDbStore().ordersExist) {
-    const orderlist = useDbStore().orderBy.map((order) => {
+    const orderlist = useDbStore().selectedTableOptions.orderBy.map((order) => {
       return '"' + order.colname + '"' + (order.desc ? " DESC" : "");
     });
 
@@ -196,29 +203,34 @@ const populateData = async (page: number) => {
 
   data.value = await $NativeService().queryDb(
     sql,
-    useDbStore().customFilter ? [] : toRaw(useDbStore().useFilterParams)
+    useDbStore().selectedTableOptions.customFilter
+      ? []
+      : toRaw(useDbStore().useFilterParams)
   );
 };
 
 const removeFilter = () => {
-  useDbStore().useFilter = [];
-  useDbStore().customFilter = undefined;
+  useDbStore().selectedTableOptions.useFilter = [];
+  useDbStore().selectedTableOptions.customFilter = undefined;
   currentPage.value = 1;
   fetchRowCount();
   populateData(currentPage.value);
 };
 
 const removeOrder = () => {
-  useDbStore().orderBy = [];
+  useDbStore().selectedTableOptions.orderBy = [];
   currentPage.value = 1;
   fetchRowCount();
   populateData(currentPage.value);
 };
 
 const deleteCurrent = async () => {
-  if (useDbStore().customFilter) {
+  if (useDbStore().selectedTableOptions.customFilter) {
     await $NativeService().execDb(
-      "DELETE FROM " + table.name + " WHERE " + useDbStore().customFilter,
+      "DELETE FROM " +
+        table.name +
+        " WHERE " +
+        useDbStore().selectedTableOptions.customFilter,
       []
     );
   } else if (useDbStore().filtersExist) {
@@ -234,18 +246,18 @@ const deleteCurrent = async () => {
 };
 
 const orderBy = (col: Column) => {
-  const orderingBy = useDbStore().orderBy;
+  const orderingBy = useDbStore().selectedTableOptions.orderBy;
   let desc = false;
   if (orderingBy.length === 1 && orderingBy[0].colname === col.name) {
     desc = !orderingBy[0].desc;
   }
 
-  useDbStore().orderBy = [{ colname: col.name, desc }];
+  useDbStore().selectedTableOptions.orderBy = [{ colname: col.name, desc }];
   populateData(1);
 };
 
 const getOrdering = (col: Column) => {
-  const orderingBy = useDbStore().orderBy;
+  const orderingBy = useDbStore().selectedTableOptions.orderBy;
 
   if (orderingBy.length !== 1 || orderingBy[0].colname !== col.name) {
     return "none";

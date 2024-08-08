@@ -24,7 +24,7 @@
 const { $navigateTo } = useNuxtApp();
 
 const usable = ref(false);
-const where = ref(useDbStore().customFilter ?? "");
+const where = ref(useDbStore().selectedTableOptions.customFilter ?? "");
 
 const filter = () => {
   if (!where.value) {
@@ -35,7 +35,7 @@ const filter = () => {
     return;
   }
 
-  useDbStore().customFilter = where.value;
+  useDbStore().selectedTableOptions.customFilter = where.value;
 
   useNotificationStore().send("Applied filter", NotificationType.SUCCESS);
 

@@ -11,30 +11,32 @@
         <Checkbox v-model="allany" />
         <h5>Herhangi Biri</h5>
       </div>
-      <FilterField
-        v-for="i in filterCount"
-        v-model:colindex="colindex[i - 1]"
-        v-model:opindex="opindex[i - 1]"
-        v-model:comp1="comp1[i - 1]"
-        v-model:comp2="comp2[i - 1]"
-      />
-      <div class="btns-wrapper">
+      <div class="filter-field" v-for="i in colindex.length">
         <Button
-          class="removebtn"
-          type="bordered"
+          type="empty"
           corners="circle"
-          icon="remove"
           onlyicon
-          @click="filterCount--"
-          v-if="filterCount > 0"
+          icon="delete"
+          class="delete-btn"
+          @click="deleteFilter(i - 1)"
         ></Button>
+
+        <FilterField
+          v-model:colindex="colindex[i - 1]"
+          v-model:opindex="opindex[i - 1]"
+          v-model:comp1="comp1[i - 1]"
+          v-model:comp2="comp2[i - 1]"
+          v-model:complist="complist[i - 1]"
+        />
+      </div>
+      <div class="btns-wrapper">
         <Button
           class="addbtn"
           type="bordered"
           corners="circle"
           icon="add"
           onlyicon
-          @click="filterCount++"
+          @click="addFilter"
         ></Button>
       </div>
     </div>
@@ -45,82 +47,97 @@
 import {
   FILTER_OPERATIONS,
   FILTER_OPERATIONS_PARAMETER_COUNTS,
+  FILTER_OPERATIONS_LIST,
 } from "~/globals";
 
 const { $navigateTo } = useNuxtApp();
 
-const filterCount = ref(useDbStore().useFilter.length);
-
 const table = useDbStore().selectedTable;
 
 onMounted(() => {
-  const colindex_start = useDbStore().useFilter.map((filter) => {
-    const col = useDbStore().selectedTable.cols.find(
-      (col) => col.name === filter.colname
-    );
-    return col?.cid;
-  });
+  const colindex_start = useDbStore().selectedTableOptions.useFilter.map(
+    (filter) => {
+      const col = useDbStore().selectedTable.cols.find(
+        (col) => col.name === filter.colname
+      );
+      return col?.cid;
+    }
+  );
 
-  const opindex_start = useDbStore().useFilter.map((filter) => {
-    return FILTER_OPERATIONS.findIndex((op) => op === filter.op);
-  });
+  const opindex_start = useDbStore().selectedTableOptions.useFilter.map(
+    (filter) => {
+      return FILTER_OPERATIONS.findIndex((op) => op === filter.op);
+    }
+  );
 
   const comp1_start = [];
   const comp2_start = [];
+  const complist_start = [];
 
   const filterParams = useDbStore().useFilterParamsFull;
 
   let cursor = 0;
-  for (const filter of useDbStore().useFilter) {
+  for (const filter of useDbStore().selectedTableOptions.useFilter) {
     const index = FILTER_OPERATIONS.findIndex((op) => op === filter.op);
-    const parameterCount = FILTER_OPERATIONS_PARAMETER_COUNTS[index];
 
     let c1push = "";
     let c2push = "";
+    let clpush = [] as any[];
 
-    if (parameterCount >= 1) {
-      c1push = filterParams[cursor] + "";
+    if (FILTER_OPERATIONS_LIST[index]) {
+      clpush = (filterParams[cursor] as any[]).map((param) => param + "");
       cursor++;
-      if (parameterCount >= 2) {
-        c2push = filterParams[cursor] + "";
+    } else {
+      const parameterCount = FILTER_OPERATIONS_PARAMETER_COUNTS[index];
+
+      if (parameterCount >= 1) {
+        c1push = filterParams[cursor] + "";
         cursor++;
+        if (parameterCount >= 2) {
+          c2push = filterParams[cursor] + "";
+          cursor++;
+        }
       }
     }
-
     comp1_start.push(c1push);
     comp2_start.push(c2push);
+    complist_start.push(clpush);
   }
 
   colindex.value = colindex_start;
   opindex.value = opindex_start;
   comp1.value = comp1_start;
   comp2.value = comp2_start;
+  complist.value = complist_start;
 });
 
 const colindex = ref([]) as Ref<(number | undefined)[]>;
 const opindex = ref([]) as Ref<(number | undefined)[]>;
 const comp1 = ref([]) as Ref<string[]>;
 const comp2 = ref([]) as Ref<string[]>;
+const complist = ref([]) as Ref<string[][]>;
 
-const allany = ref(useDbStore().useFilterAny);
+const allany = ref(useDbStore().selectedTableOptions.useFilterAny);
 
 watch(allany, (val) => {
-  useDbStore().useFilterAny = val;
+  useDbStore().selectedTableOptions.useFilterAny = val;
 });
 
 const filter = () => {
-  useDbStore().useFilter = [];
+  useDbStore().selectedTableOptions.useFilter = [];
 
-  for (let i = 0; i < filterCount.value; i++) {
+  for (let i = 0; i < colindex.value.length; i++) {
     if (colindex.value[i] === undefined || opindex.value[i] === undefined) {
       continue;
     }
-    const parameterCount =
-      FILTER_OPERATIONS_PARAMETER_COUNTS[opindex.value[i]!];
+    const index = opindex.value[i]!;
+    const parameterCount = FILTER_OPERATIONS_PARAMETER_COUNTS[index];
+    const isList = FILTER_OPERATIONS_LIST[index];
 
     if (
-      (parameterCount >= 1 && !comp1.value[i]) ||
-      (parameterCount >= 2 && !comp2.value[i])
+      (isList && complist.value[i].length === 0) ||
+      (!isList && parameterCount >= 1 && !comp1.value[i]) ||
+      (!isList && parameterCount >= 2 && !comp2.value[i])
     ) {
       useNotificationStore().send(
         "Boş parametre bırakılamaz.",
@@ -131,15 +148,19 @@ const filter = () => {
 
     const col = table.cols[colindex.value[i]!];
 
-    const comparr = [];
-    if (FILTER_OPERATIONS_PARAMETER_COUNTS[opindex.value[i]!] >= 1) {
-      comparr.push(comp1.value[i]);
-      if (FILTER_OPERATIONS_PARAMETER_COUNTS[opindex.value[i]!] >= 2) {
-        comparr.push(comp2.value[i]);
+    let comparr = [];
+    if (isList) {
+      comparr = [complist.value[i]];
+    } else {
+      if (parameterCount >= 1) {
+        comparr.push(comp1.value[i]);
+        if (parameterCount >= 2) {
+          comparr.push(comp2.value[i]);
+        }
       }
     }
 
-    useDbStore().useFilter.push({
+    useDbStore().selectedTableOptions.useFilter.push({
       colname: col.name,
       op: FILTER_OPERATIONS[opindex.value[i]!],
       comp: comparr,
@@ -149,6 +170,22 @@ const filter = () => {
   useNotificationStore().send("Tablo filtrelendi.", NotificationType.SUCCESS);
 
   $navigateTo("/table");
+};
+
+const addFilter = () => {
+  colindex.value.push(-1);
+  opindex.value.push(-1);
+  comp1.value.push("");
+  comp2.value.push("");
+  complist.value.push([]);
+};
+
+const deleteFilter = (index: number) => {
+  colindex.value.splice(index, 1);
+  opindex.value.splice(index, 1);
+  comp1.value.splice(index, 1);
+  comp2.value.splice(index, 1);
+  complist.value.splice(index, 1);
 };
 </script>
 
@@ -173,6 +210,21 @@ const filter = () => {
   justify-content: center;
   align-items: center;
   column-gap: 10px;
+}
+
+.filter-field {
+  position: relative;
+
+  .delete-btn {
+    position: absolute;
+    left: 20px;
+
+    --accent-color: var(--error-color);
+    --accent-hover: var(--error-color);
+    &:deep(.icon) {
+      --icon-color: var(--error-color);
+    }
+  }
 }
 
 .btns-wrapper {

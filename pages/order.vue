@@ -36,29 +36,33 @@
 <script setup lang="ts">
 const { $navigateTo } = useNuxtApp();
 
-const orderCount = ref(useDbStore().orderBy.length);
+const orderCount = ref(useDbStore().selectedTableOptions.orderBy.length);
 
 const table = useDbStore().selectedTable;
 
-const colindex_start = useDbStore().orderBy.map((order) => {
-  const col = useDbStore().selectedTable.cols.find(
-    (col) => col.name === order.colname
-  );
-  return col?.cid;
-});
+const colindex_start = useDbStore().selectedTableOptions.orderBy.map(
+  (order) => {
+    const col = useDbStore().selectedTable.cols.find(
+      (col) => col.name === order.colname
+    );
+    return col?.cid;
+  }
+);
 
-const desc_start = useDbStore().orderBy.map((order) => order.desc);
+const desc_start = useDbStore().selectedTableOptions.orderBy.map(
+  (order) => order.desc
+);
 
 const colindex = ref(colindex_start);
 const desc = ref(desc_start);
 
 const order = () => {
-  useDbStore().orderBy = [];
+  useDbStore().selectedTableOptions.orderBy = [];
 
   for (let i = 0; i < orderCount.value; i++) {
     const col = table.cols[colindex.value[i]!];
 
-    useDbStore().orderBy.push({
+    useDbStore().selectedTableOptions.orderBy.push({
       colname: col.name,
       desc: desc.value[i],
     });

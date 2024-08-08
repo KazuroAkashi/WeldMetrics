@@ -88,6 +88,10 @@ const click = (index: number) => {
   --option-padding-tb: 8px;
 
   position: relative;
+
+  &:not(.increase) {
+    margin: 0;
+  }
 }
 
 .optionmenu-inner {

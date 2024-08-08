@@ -16,3 +16,10 @@ interface Column {
   pk: number;
   distinct_values?: string[];
 }
+
+interface TableOptions {
+  useFilter: Filter[];
+  useFilterAny: false;
+  orderBy: Order[];
+  customFilter: string | undefined;
+}

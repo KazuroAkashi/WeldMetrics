@@ -1,5 +1,9 @@
 import { defineStore } from "pinia";
-import { FILTER_OPERATIONS, FILTER_OPERATIONS_TEMPLATES } from "~/globals";
+import {
+  FILTER_OPERATIONS,
+  FILTER_OPERATIONS_LIST,
+  FILTER_OPERATIONS_TEMPLATES,
+} from "~/globals";
 
 export const useDbStore = defineStore("dbstore", {
   state: () => ({
@@ -8,14 +12,20 @@ export const useDbStore = defineStore("dbstore", {
     connectedTo: "",
     tables: {} as Record<string, Table>,
     selectedTableName: "",
-    useFilter: [] as Filter[],
-    useFilterAny: false,
-    orderBy: [] as Order[],
-    customFilter: undefined as string | undefined,
+
+    tableOptions: {} as Record<string, TableOptions>,
+
     itemsPerPage: parseInt(window.localStorage.getItem("itemsPerPage") ?? "10"),
   }),
 
   actions: {
+    resetTableOptions(name: string) {
+      this.tableOptions[name].useFilter = [];
+      this.tableOptions[name].useFilterAny = false;
+      this.tableOptions[name].orderBy = [];
+      this.tableOptions[name].customFilter = undefined;
+    },
+
     async refreshTables() {
       const { $NativeService } = useNuxtApp();
 
@@ -36,11 +46,23 @@ export const useDbStore = defineStore("dbstore", {
   },
 
   getters: {
-    ordersExist(state) {
-      return state.orderBy.length > 0;
+    selectedTableOptions(state): TableOptions {
+      const opts = state.tableOptions[this.selectedTableName];
+      if (opts) return opts;
+
+      return (state.tableOptions[this.selectedTableName] = {
+        useFilter: [],
+        useFilterAny: false,
+        customFilter: undefined,
+        orderBy: [],
+      });
     },
-    filtersExist(state) {
-      return state.useFilter.length > 0;
+
+    ordersExist(state): boolean {
+      return this.selectedTableOptions.orderBy.length > 0;
+    },
+    filtersExist(state): boolean {
+      return this.selectedTableOptions.useFilter.length > 0;
     },
 
     selectedTable(state) {
@@ -50,16 +72,17 @@ export const useDbStore = defineStore("dbstore", {
     useFilterParams(state): any[] {
       const ret = [];
 
-      for (let filter of state.useFilter) {
+      for (let filter of this.selectedTableOptions.useFilter) {
+        const index = FILTER_OPERATIONS.findIndex((val) => val === filter.op);
         for (let comp of filter.comp) {
-          if (filter.op === "IN" || filter.op === "NOT IN") {
+          if (FILTER_OPERATIONS_LIST[index]) {
             continue;
           } else
             ret.push(
               useNuxtApp()
                 .$UtilService()
                 .parseValue(
-                  comp,
+                  comp as string,
                   this.selectedTable.cols.find(
                     (col) => col.name === filter.colname
                   )!,
@@ -75,16 +98,17 @@ export const useDbStore = defineStore("dbstore", {
     useFilterParamsFull(state): any[] {
       const ret = [];
 
-      for (let filter of state.useFilter) {
+      for (let filter of this.selectedTableOptions.useFilter) {
+        const index = FILTER_OPERATIONS.findIndex((val) => val === filter.op);
         for (let comp of filter.comp) {
-          if (filter.op === "IN" || filter.op === "NOT IN") {
+          if (FILTER_OPERATIONS_LIST[index]) {
             ret.push(comp);
           } else
             ret.push(
               useNuxtApp()
                 .$UtilService()
                 .parseValue(
-                  comp,
+                  comp as string,
                   this.selectedTable.cols.find(
                     (col) => col.name === filter.colname
                   )!,
@@ -102,25 +126,13 @@ export const useDbStore = defineStore("dbstore", {
 
       const ret = [];
 
-      for (let filter of state.useFilter) {
+      for (let filter of this.selectedTableOptions.useFilter) {
         const index = FILTER_OPERATIONS.findIndex((val) => val === filter.op);
         const temp = FILTER_OPERATIONS_TEMPLATES[index];
-        if (filter.op !== "IN" && filter.op !== "NOT IN")
+        if (!FILTER_OPERATIONS_LIST[index])
           ret.push('"' + filter.colname + '" ' + temp);
         else {
-          const list = useNuxtApp()
-            .$UtilService()
-            .parseValue(
-              filter.comp[0],
-              this.selectedTable.cols.find(
-                (col) => col.name === filter.colname
-              )!,
-              null,
-              true
-            );
-
-          const str = JSON.stringify(list);
-          console.log(str);
+          const str = JSON.stringify(filter.comp[0]);
 
           ret.push(
             '"' +
@@ -134,7 +146,9 @@ export const useDbStore = defineStore("dbstore", {
         }
       }
 
-      return state.useFilterAny ? ret.join(" OR ") : ret.join(" AND ");
+      return this.selectedTableOptions.useFilterAny
+        ? ret.join(" OR ")
+        : ret.join(" AND ");
     },
   },
 });

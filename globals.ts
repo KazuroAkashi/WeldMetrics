@@ -61,7 +61,23 @@ export const FILTER_OPERATIONS_SUGGEST = [
   false,
   false,
   false,
+  true,
+  true,
+  false,
+];
+
+export const FILTER_OPERATIONS_LIST = [
   false,
   false,
+  false,
+  false,
+  false,
+  false,
+  false,
+  false,
+  false,
+  false,
+  true,
+  true,
   false,
 ];

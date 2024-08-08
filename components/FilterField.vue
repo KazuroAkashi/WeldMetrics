@@ -14,21 +14,50 @@
       v-model="opindex"
       :max-height="300"
     />
-    <OptionMenu
-      class="optionmenu"
-      :options="suggestions"
-      placeholder="1. Parametre"
-      v-model="sugindex"
-      v-if="suggestions.length > 0 && parameterCount >= 1"
-      :max-height="300"
-      :key="sugkey"
-    />
-    <TextField
-      placeholder="1. Parametre"
-      underlined
-      v-model="comp1"
-      v-if="suggestions.length === 0 && parameterCount >= 1"
-    />
+    <div class="param1">
+      <OptionMenu
+        class="optionmenu"
+        :options="suggestions"
+        placeholder="1. Parametre"
+        v-model="sugindex"
+        v-if="suggestions.length > 0 && parameterCount >= 1"
+        :max-height="300"
+        :key="sugkey"
+      />
+      <TextField
+        placeholder="1. Parametre"
+        underlined
+        v-model="comp1"
+        v-if="suggestions.length === 0 && parameterCount >= 1"
+      />
+      <Button
+        type="empty"
+        corners="circle"
+        onlyicon
+        icon="add"
+        v-if="isListParameter()"
+        @click="addToList"
+      ></Button>
+      <div class="complist-items">
+        <div
+          v-for="(item, index) in complist"
+          :key="item"
+          class="complist-item"
+        >
+          <p>
+            {{ item }}
+          </p>
+          <Button
+            type="empty"
+            corners="circle"
+            onlyicon
+            icon="close"
+            class="delete-btn"
+            @click="removeFromList(index)"
+          ></Button>
+        </div>
+      </div>
+    </div>
     <TextField
       placeholder="2. Parameter"
       underlined
@@ -43,14 +72,14 @@ import {
   FILTER_OPERATIONS,
   FILTER_OPERATIONS_PARAMETER_COUNTS,
   FILTER_OPERATIONS_SUGGEST,
+  FILTER_OPERATIONS_LIST,
 } from "~/globals";
-
-const { $NativeService } = useNuxtApp();
 
 const colindex = defineModel<number>("colindex");
 const opindex = defineModel<number>("opindex");
 const comp1 = defineModel<string>("comp1");
 const comp2 = defineModel<string>("comp2");
+const complist = defineModel<string[]>("complist");
 
 const table = useDbStore().selectedTable;
 
@@ -82,6 +111,7 @@ watch([colindex, opindex], async () => {
   await update();
   comp1.value = "";
   comp2.value = "";
+  complist.value = [];
   sugindex.value = undefined;
 });
 
@@ -110,18 +140,68 @@ const update = async () => {
     suggestions.value = [];
   }
 };
+
+const isListParameter = () => {
+  return (
+    opindex.value !== undefined &&
+    parameterCount.value >= 1 &&
+    FILTER_OPERATIONS_LIST[opindex.value]
+  );
+};
+
+const addToList = () => {
+  if (complist.value === undefined && comp1.value) {
+    complist.value = [comp1.value];
+  }
+  if (
+    complist.value !== undefined &&
+    comp1.value &&
+    !complist.value.includes(comp1.value)
+  )
+    complist.value.push(comp1.value);
+
+  sugkey.value += 1;
+};
+
+const removeFromList = (index: number) => {
+  complist.value?.splice(index, 1);
+  sugkey.value += 1;
+};
 </script>
 
 <style scoped lang="scss">
 .options {
   display: grid;
   justify-content: space-around;
-  align-items: center;
+  align-items: start;
   grid-template-columns: repeat(4, max-content);
 
   margin-left: 50px;
   margin-right: 50px;
   margin-top: 30px;
   column-gap: 20px;
+}
+
+.param1 {
+  display: flex;
+  align-items: flex-start;
+
+  column-gap: 15px;
+}
+
+.complist-item {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+
+  column-gap: 5px;
+}
+
+.delete-btn {
+  --accent-color: var(--error-color);
+  --accent-hover: var(--error-color);
+  &:deep(.icon) {
+    --icon-color: var(--error-color);
+  }
 }
 </style>
