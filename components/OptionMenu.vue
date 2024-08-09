@@ -5,7 +5,7 @@
     :style="{
       width: width + 'px',
     }"
-    @click="listopen = !listopen"
+    @click="toggleOpen"
     v-click-outside="clickOutside"
   >
     <div
@@ -14,16 +14,23 @@
         width: width + 'px',
       }"
     >
-      <div ref="textEl" class="optionmenu-content">
+      <TextField
+        :placeholder="$props.placeholder"
+        v-model="optionText"
+        v-if="$props.typable"
+      />
+      <div ref="textEl" class="optionmenu-content" v-if="!typable">
         <p>{{ contentText }}</p>
       </div>
-      <div class="optionmenu-icon">
+      <div class="optionmenu-icon" v-if="!typable">
         <Icon icon="expand_more" />
       </div>
     </div>
     <Accordion class="optionmenu-list" :open="listopen" :max-height="maxHeight">
       <Button
-        v-for="(opt, i) in $props.options"
+        v-for="(opt, i) in $props.options.filter((str) =>
+          str.toLowerCase().includes(optionText.toLowerCase())
+        )"
         type="none"
         leftalign
         class="optionmenu-option"
@@ -39,6 +46,7 @@
 const props = defineProps<{
   placeholder: string;
   round?: boolean;
+  typable?: boolean;
 
   maxHeight?: number;
 
@@ -52,6 +60,8 @@ const selected = defineModel<number>({
 const contentText = computed(() =>
   selected.value === -1 ? props.placeholder : props.options[selected.value]
 );
+
+const optionText = ref("");
 
 const textEl = ref() as Ref<HTMLElement>;
 
@@ -73,6 +83,10 @@ const clickOutside = (ev: Event) => {
 
 const click = (index: number) => {
   selected.value = index;
+};
+
+const toggleOpen = () => {
+  if (!props.typable) listopen.value = !listopen.value;
 };
 </script>
 

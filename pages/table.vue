@@ -2,7 +2,7 @@
   <div class="table">
     <div class="control-btns">
       <TransitionGroup name="hor-btns" appear>
-        <Button type="bordered" href="/" icon="chevron_left" key="1"
+        <Button type="bordered" @click="goBack" icon="chevron_left" key="1"
           >Geri</Button
         >
         <!-- <Button type="filled" href="/insert">Insert Row</Button> -->
@@ -82,8 +82,14 @@
                 :style="{
                   width: 'calc(100% / ' + table.cols.length + ')',
                 }"
+                :class="{
+                  tablename: Object.keys(useDbStore().tables).includes(
+                    cellValue(i - 1, col.name)
+                  ),
+                }"
+                @click="tryGoToTable(cellValue(i - 1, col.name))"
               >
-                {{ i - 1 < data.length ? data[i - 1][col.name] : " " }}
+                {{ cellValue(i - 1, col.name) }}
               </td>
             </tr>
           </tbody>
@@ -154,9 +160,13 @@ const pageCount = computed(() => {
 const data = ref([] as Record<string, any>[]);
 
 onMounted(async () => {
-  await fetchRowCount();
-  await populateData(currentPage.value);
+  fetchRowCount();
+  populateData(1);
 });
+
+const cellValue = (row: number, col: string) => {
+  return row < data.value.length ? data.value[row][col] : " ";
+};
 
 const fetchRowCount = async () => {
   let sql = "SELECT COUNT(*) FROM " + table.name;
@@ -307,9 +317,27 @@ const nextPage = () => {
   populateData(newpage);
 };
 
-const lastPage = () => {
+const lastPage = async () => {
   const newpage = pageCount.value;
   populateData(newpage);
+};
+
+const goBack = async () => {
+  const last = useDbStore().tableHistory.pop();
+
+  if (!last || !(await tryGoToTable(last))) {
+    useNuxtApp().$navigateTo("/");
+  }
+};
+
+const tryGoToTable = async (name: string) => {
+  if (!Object.keys(useDbStore().tables).includes(name)) return false;
+
+  useDbStore().selectedTableName = name;
+  useDbStore().tableHistory.push(table.name);
+  await useNuxtApp().$router.push("/");
+  await useNuxtApp().$router.push("/table");
+  return true;
 };
 </script>
 
@@ -443,6 +471,11 @@ const lastPage = () => {
   th:not(:last-child),
   td:not(:last-child) {
     border-right: 1px solid var(--background-color-r1);
+  }
+
+  td.tablename {
+    text-decoration: underline;
+    cursor: pointer;
   }
 }
 

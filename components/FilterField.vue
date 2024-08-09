@@ -91,36 +91,61 @@ const suggestions = ref([] as string[]);
 const sugindex = ref() as Ref<number | undefined>;
 const sugkey = ref(0);
 
-let firstPass = true;
-
 onMounted(async () => {
   await nextTick();
-  await update();
+  update();
 
   if (comp1.value && suggestions.value.length > 0) {
     sugindex.value = suggestions.value.findIndex((sug) => sug === comp1.value);
   }
 });
 
-watch([colindex, opindex], async () => {
-  if (firstPass) {
-    firstPass = false;
-    return;
-  }
+watch(
+  [colindex, opindex],
+  async (newVal, oldVal) => {
+    update();
 
-  await update();
-  comp1.value = "";
-  comp2.value = "";
-  complist.value = [];
-  sugindex.value = undefined;
-});
+    let keepParam1 = false;
+    let keepList = false;
+
+    if (
+      oldVal[0] !== undefined &&
+      oldVal[1] !== undefined &&
+      newVal[0] !== undefined &&
+      newVal[1] !== undefined &&
+      oldVal[0] === newVal[0]
+    ) {
+      if (
+        FILTER_OPERATIONS_LIST[oldVal[1]] &&
+        FILTER_OPERATIONS_LIST[newVal[1]]
+      )
+        keepList = true;
+
+      const colname = cols[newVal[0]];
+      const col = table.cols.find((col) => col.name === colname);
+      if (
+        col?.type !== "VARCHAR" ||
+        (FILTER_OPERATIONS_SUGGEST[oldVal[1]] &&
+          FILTER_OPERATIONS_SUGGEST[newVal[1]])
+      )
+        keepParam1 = true;
+    }
+    if (!keepParam1) {
+      comp1.value = "";
+      sugindex.value = undefined;
+    }
+    comp2.value = "";
+    if (!keepList) complist.value = [];
+  },
+  { flush: "post" }
+);
 
 watch(sugindex, () => {
   if (sugindex.value !== undefined && suggestions.value.length > sugindex.value)
     comp1.value = suggestions.value[sugindex.value];
 });
 
-const update = async () => {
+const update = () => {
   if (colindex.value === undefined || opindex.value === undefined) {
     suggestions.value = [];
     return;
@@ -159,6 +184,9 @@ const addToList = () => {
     !complist.value.includes(comp1.value)
   )
     complist.value.push(comp1.value);
+
+  sugindex.value = undefined;
+  comp1.value = "";
 
   sugkey.value += 1;
 };

@@ -11,6 +11,7 @@ export const useDbStore = defineStore("dbstore", {
 
     connectedTo: "",
     tables: {} as Record<string, Table>,
+    tableHistory: [] as string[],
     selectedTableName: "",
 
     tableOptions: {} as Record<string, TableOptions>,
