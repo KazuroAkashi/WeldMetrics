@@ -48,6 +48,9 @@
     <div class="table-wrapper-outer">
       <div class="table-wrapper">
         <p>
+          Tablo: <span class="accent">{{ table.name }}</span>
+        </p>
+        <p>
           <span class="accent">{{ rowCount }}</span> satır bulundu
         </p>
         <table class="table-inner">
@@ -325,16 +328,16 @@ const lastPage = async () => {
 const goBack = async () => {
   const last = useDbStore().tableHistory.pop();
 
-  if (!last || !(await tryGoToTable(last))) {
+  if (!last || !(await tryGoToTable(last, true))) {
     useNuxtApp().$navigateTo("/");
   }
 };
 
-const tryGoToTable = async (name: string) => {
+const tryGoToTable = async (name: string, nohistory?: boolean) => {
   if (!Object.keys(useDbStore().tables).includes(name)) return false;
 
   useDbStore().selectedTableName = name;
-  useDbStore().tableHistory.push(table.name);
+  if (!nohistory) useDbStore().tableHistory.push(table.name);
   await useNuxtApp().$router.push("/");
   await useNuxtApp().$router.push("/table");
   return true;
