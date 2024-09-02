@@ -48,6 +48,13 @@ onMounted(async () => {
   };
   await nextTick();
   loading.value = false;
+
+  document.fonts.ready.then(() => {
+    const check = document.fonts.check("24px 'Material Icons'");
+    if (check) {
+      useShowIcons().value = true;
+    }
+  });
 });
 
 interface CustomElement extends HTMLElement {

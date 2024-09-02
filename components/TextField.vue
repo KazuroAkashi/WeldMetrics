@@ -8,6 +8,8 @@
         $props.icon || !$props.underlined ? $props.placeholder : ' '
       "
       v-model="model"
+      @focusin="$emit('focusin')"
+      @focusout="$emit('focusout')"
     />
     <label :for="id" class="textfield-icon">
       <!-- <i :class="$props.icon"></i> -->
@@ -32,7 +34,7 @@ const props = defineProps({
   underlined: Boolean,
 });
 
-const emit = defineEmits(["input"]);
+const emit = defineEmits(["input", "focusin", "focusout"]);
 
 const model = defineModel<string>();
 </script>

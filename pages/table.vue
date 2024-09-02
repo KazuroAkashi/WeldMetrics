@@ -53,7 +53,7 @@
         <p>
           <span class="accent">{{ rowCount }}</span> satır bulundu
         </p>
-        <table class="table-inner">
+        <table class="table-inner" ref="tableEl">
           <thead>
             <tr>
               <th v-for="col in table.cols" @click="orderBy(col)">
@@ -148,6 +148,8 @@
 const { $NativeService } = useNuxtApp();
 
 const table = useDbStore().selectedTable;
+
+const tableEl = ref() as Ref<HTMLElement>;
 
 const currentPage = ref(1);
 
@@ -306,23 +308,50 @@ const exportTable = async () => {
   );
 };
 
+const vibrateTable = () => {
+  tableEl.value.animate(
+    [
+      {
+        transform: "translateY(0)",
+        opacity: 1,
+      },
+      {
+        transform: "translateY(15px)",
+        opacity: 0.6,
+      },
+      {
+        transform: "translateY(0)",
+        opacity: 1,
+      },
+    ],
+    {
+      duration: 300,
+      easing: "ease-in-out",
+    }
+  );
+};
+
 const firstPage = () => {
   populateData(1);
+  vibrateTable();
 };
 
 const prevPage = () => {
   const newpage = Math.max(currentPage.value - 1, 1);
   populateData(newpage);
+  vibrateTable();
 };
 
 const nextPage = () => {
   const newpage = Math.min(currentPage.value + 1, pageCount.value);
   populateData(newpage);
+  vibrateTable();
 };
 
 const lastPage = async () => {
   const newpage = pageCount.value;
   populateData(newpage);
+  vibrateTable();
 };
 
 const goBack = async () => {

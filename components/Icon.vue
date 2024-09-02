@@ -1,6 +1,6 @@
 <template>
   <span
-    v-if="$props.icon"
+    v-if="$props.icon && useShowIcons().value"
     class="icon"
     :class="{ fill: icon.fill }"
     aria-hidden="true"

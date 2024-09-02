@@ -1,8 +1,10 @@
 <template>
   <div class="order">
     <div class="control-btns">
-      <Button type="filled" @click="order">Sırala</Button>
-      <Button type="bordered" href="/table">İptal</Button>
+      <Button type="filled" @click="order" icon="format_list_numbered"
+        >Sırala</Button
+      >
+      <Button type="bordered" href="/table" icon="close">İptal</Button>
     </div>
     <div class="orders">
       <OrderField

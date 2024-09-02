@@ -1,29 +1,27 @@
 <template>
   <div
     class="optionmenu-wrapper"
-    :class="{ ...$props, active: selected !== -1, open: listopen }"
+    :class="{ ...$props, open: listopen }"
     :style="{
       width: width + 'px',
     }"
-    @click="toggleOpen"
     v-click-outside="clickOutside"
   >
-    <div
-      class="optionmenu-inner"
-      :style="{
-        width: width + 'px',
-      }"
+    <TextField
+      :placeholder="$props.placeholder"
+      v-model="optionText"
+      class="optionmenu-typer"
+      underlined
+      @focusin="focusin"
+    />
+    <Accordion
+      class="optionmenu-list"
+      :open="listopen"
+      :max-height="maxHeight"
+      :key="acckey"
     >
-      <div ref="textEl" class="optionmenu-content">
-        <p>{{ contentText }}</p>
-      </div>
-      <div class="optionmenu-icon">
-        <Icon icon="expand_more" />
-      </div>
-    </div>
-    <Accordion class="optionmenu-list" :open="listopen" :max-height="maxHeight">
       <Button
-        v-for="(opt, i) in $props.options"
+        v-for="(opt, i) in filteredOptions"
         type="none"
         leftalign
         class="optionmenu-option"
@@ -40,22 +38,34 @@ const props = defineProps<{
   placeholder: string;
   round?: boolean;
 
+  starter?: string;
+
   maxHeight?: number;
+  maxItems?: number;
 
   options: string[];
+
+  searchFunc?: (input: string) => Promise<string[]>;
 }>();
 
+const acckey = ref(0);
+
 const listopen = ref(false);
-const selected = defineModel<number>({
-  default: -1,
+const optionText = defineModel<string>({
+  default: "",
 });
-const contentText = computed(() =>
-  selected.value === -1 ? props.placeholder : props.options[selected.value]
-);
+
+const filteredOptions = ref([] as string[]);
+
+watch(optionText, async () => {
+  await focusin();
+});
 
 const textEl = ref() as Ref<HTMLElement>;
 
 const width = ref(1);
+
+const focusDontOpenList = ref(false);
 
 onMounted(() => {
   const list = [props.placeholder, ...props.options];
@@ -65,18 +75,40 @@ onMounted(() => {
     if (w > maxwidth) maxwidth = w;
   }
   width.value = maxwidth + 80;
+
+  if (props.starter) {
+    focusDontOpenList.value = true;
+    optionText.value = props.starter;
+  }
 });
+
+const updateOptions = async () => {
+  if (props.searchFunc) {
+    filteredOptions.value = await props.searchFunc(optionText.value.toString());
+  } else {
+    filteredOptions.value = props.options.filter((str) =>
+      str?.toString().toLowerCase().includes(optionText.value.toLowerCase())
+    );
+  }
+  acckey.value += 1;
+};
 
 const clickOutside = (ev: Event) => {
   listopen.value = false;
 };
 
 const click = (index: number) => {
-  selected.value = index;
+  focusDontOpenList.value = true;
+  optionText.value = filteredOptions.value[index];
+  listopen.value = false;
 };
 
-const toggleOpen = () => {
-  listopen.value = !listopen.value;
+const focusin = async () => {
+  await updateOptions();
+  if (filteredOptions.value.length !== 0 && !focusDontOpenList.value) {
+    listopen.value = true;
+  }
+  if (focusDontOpenList.value) focusDontOpenList.value = false;
 };
 </script>
 

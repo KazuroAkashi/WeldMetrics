@@ -1,9 +1,11 @@
 <template>
   <div class="filter">
     <div class="control-btns">
-      <Button type="filled" @click="filter">Filtrele</Button>
-      <Button type="bordered" href="/customfilter">Özel Filtre</Button>
-      <Button type="bordered" href="/table">İptal</Button>
+      <Button type="filled" @click="filter" icon="filter_alt">Filtrele</Button>
+      <Button type="bordered" href="/customfilter" icon="palette"
+        >Özel Filtre</Button
+      >
+      <Button type="bordered" href="/table" icon="close">İptal</Button>
     </div>
     <div class="filters">
       <div class="all-any">

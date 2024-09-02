@@ -32,17 +32,17 @@ export const useDbStore = defineStore("dbstore", {
 
       this.tables = await $NativeService().listTablesDb();
 
-      for (const table of Object.values(this.tables)) {
-        for (const col of table.cols) {
-          if (col.type !== "VARCHAR") continue;
+      // for (const table of Object.values(this.tables)) {
+      //   for (const col of table.cols) {
+      //     if (col.type !== "VARCHAR") continue;
 
-          const items = await $NativeService().queryDb(
-            'SELECT DISTINCT "' + col.name + '" FROM ' + table.name
-          );
+      //     const items = await $NativeService().queryDb(
+      //       'SELECT DISTINCT "' + col.name + '" FROM ' + table.name
+      //     );
 
-          col.distinct_values = items.map((item) => item[col.name]);
-        }
-      }
+      //     col.distinct_values = items.map((item) => item[col.name]);
+      //   }
+      // }
     },
   },
 

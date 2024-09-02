@@ -15,21 +15,23 @@
       :max-height="300"
     />
     <div class="param1">
-      <OptionMenu
+      <TypableOptionMenu
         class="optionmenu"
         :options="suggestions"
         placeholder="1. Parametre"
-        v-model="sugindex"
-        v-if="suggestions.length > 0 && parameterCount >= 1"
+        v-model="sugselected"
+        :starter="comp1"
+        v-if="parameterCount >= 1"
         :max-height="300"
         :key="sugkey"
+        :search-func="searchSuggestion"
       />
-      <TextField
+      <!-- <TextField
         placeholder="1. Parametre"
         underlined
         v-model="comp1"
         v-if="suggestions.length === 0 && parameterCount >= 1"
-      />
+      /> -->
       <Button
         type="empty"
         corners="circle"
@@ -75,6 +77,8 @@ import {
   FILTER_OPERATIONS_LIST,
 } from "~/globals";
 
+const { $NativeService } = useNuxtApp();
+
 const colindex = defineModel<number>("colindex");
 const opindex = defineModel<number>("opindex");
 const comp1 = defineModel<string>("comp1");
@@ -88,22 +92,20 @@ const ops = ref(FILTER_OPERATIONS);
 
 const parameterCount = ref(0);
 const suggestions = ref([] as string[]);
-const sugindex = ref() as Ref<number | undefined>;
+const sugselected = ref() as Ref<string>;
 const sugkey = ref(0);
+
+const comp1DontOpenList = ref(false);
 
 onMounted(async () => {
   await nextTick();
-  update();
-
-  if (comp1.value && suggestions.value.length > 0) {
-    sugindex.value = suggestions.value.findIndex((sug) => sug === comp1.value);
-  }
+  await update();
 });
 
 watch(
   [colindex, opindex],
   async (newVal, oldVal) => {
-    update();
+    await update();
 
     let keepParam1 = false;
     let keepList = false;
@@ -132,7 +134,7 @@ watch(
     }
     if (!keepParam1) {
       comp1.value = "";
-      sugindex.value = undefined;
+      sugselected.value = "";
     }
     comp2.value = "";
     if (!keepList) complist.value = [];
@@ -140,12 +142,11 @@ watch(
   { flush: "post" }
 );
 
-watch(sugindex, () => {
-  if (sugindex.value !== undefined && suggestions.value.length > sugindex.value)
-    comp1.value = suggestions.value[sugindex.value];
+watch(sugselected, () => {
+  if (sugselected.value !== "") comp1.value = sugselected.value;
 });
 
-const update = () => {
+const update = async () => {
   if (colindex.value === undefined || opindex.value === undefined) {
     suggestions.value = [];
     return;
@@ -156,14 +157,37 @@ const update = () => {
       ? FILTER_OPERATIONS_PARAMETER_COUNTS[opindex.value!]
       : 0;
 
+  // const col = table.cols.find((col) => col.name === colname);
+  // if (FILTER_OPERATIONS_SUGGEST[opindex.value!] && col?.type === "VARCHAR") {
+  //   suggestions.value = col.distinct_values!;
+  //   sugkey.value += 1;
+  // } else {
+  //   suggestions.value = [];
+  // }
+};
+
+const searchSuggestion = async (input: string) => {
+  if (colindex.value === undefined) return [];
+  if (!FILTER_OPERATIONS_SUGGEST[opindex.value!]) return [];
+
   const colname = cols[colindex.value];
-  const col = table.cols.find((col) => col.name === colname);
-  if (FILTER_OPERATIONS_SUGGEST[opindex.value!] && col?.type === "VARCHAR") {
-    suggestions.value = col.distinct_values!;
-    sugkey.value += 1;
-  } else {
-    suggestions.value = [];
-  }
+
+  const querySql =
+    'SELECT "' +
+    colname +
+    '" FROM ' +
+    table.name +
+    ' WHERE LOWER("' +
+    colname +
+    "\") LIKE '%" +
+    input.toLowerCase() +
+    "%' GROUP BY \"" +
+    colname +
+    '" LIMIT 20';
+
+  let items = await $NativeService().queryDb(querySql);
+
+  return items.map((item) => item[colname]);
 };
 
 const isListParameter = () => {
@@ -185,7 +209,7 @@ const addToList = () => {
   )
     complist.value.push(comp1.value);
 
-  sugindex.value = undefined;
+  sugselected.value = "";
   comp1.value = "";
 
   sugkey.value += 1;

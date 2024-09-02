@@ -5,7 +5,7 @@
     :style="{ '--max-height': elMaxHeight + 'px' }"
   >
     <Transition name="fade" appear>
-      <div class="downarrow" v-if="notScrolled && $props.open">
+      <div class="downarrow" v-if="canScroll && notScrolled && $props.open">
         <Icon icon="arrow_downward" class="downarrow-icon" />
       </div>
     </Transition>
@@ -22,6 +22,7 @@ const props = defineProps<{
 }>();
 
 const notScrolled = ref(true);
+const canScroll = ref(false);
 
 const forceOpen = ref(true);
 
@@ -39,6 +40,10 @@ onMounted(() => {
     elMaxHeight.value = props.maxHeight;
 
   forceOpen.value = false;
+
+  if (acc.value.scrollHeight > elMaxHeight.value) {
+    canScroll.value = true;
+  }
 
   acc.value.addEventListener("scroll", () => {
     notScrolled.value = acc.value.scrollTop === 0;

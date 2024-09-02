@@ -1,12 +1,12 @@
 <template>
   <div class="filter">
     <div class="control-btns">
-      <Button type="filled" @click="filter">Apply Filter</Button>
-      <Button type="bordered" href="/filter">Cancel</Button>
+      <Button type="filled" @click="filter" icon="filter_alt">Filtrele</Button>
+      <Button type="bordered" href="/filter" icon="close">İptal</Button>
     </div>
     <div class="filters">
       <div class="usable">
-        <h5>I am sure I know what I am doing</h5>
+        <h5>Ne yaptığımı gayet iyi biliyorum</h5>
         <Checkbox v-model="usable" />
       </div>
 
